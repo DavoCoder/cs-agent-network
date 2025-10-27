@@ -1,0 +1,11 @@
+{
+  "dependencies": [
+    "."
+  ],
+  "graphs": {
+    "customer_support_agent_network": "./src/orchestration/graph.py:create_agent_network"
+  },
+  "env": ".env",
+  "python_version": "3.11"
+}
+
