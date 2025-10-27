@@ -164,3 +164,10 @@ logs/
 *.temp
 tmp/
 temp/
+
+# Pinecone
+.pinecone/
+
+docs_backup/
+
+.langgraph_api/

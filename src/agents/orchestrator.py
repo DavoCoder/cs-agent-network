@@ -56,23 +56,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     # Try to get the last message
     if messages:
         last_message = messages[-1]
-        
-        # Check if it's a dict (from Studio UI)
-        if isinstance(last_message, dict):
-            # LangGraph Studio uses 'type' field: {'type': 'human', 'content': '...'}
-            msg_type = last_message.get("type")
-            msg_role = last_message.get("role")
-            if msg_type == "human" or msg_role == "user" or msg_role == "human":
-                user_message = last_message.get("content", "")
-        # Check if it's a HumanMessage object
-        elif hasattr(last_message, 'content'):
-            user_message = last_message.content
-    
-
-    print(f"DEBUG: Extracted user message: {user_message[:100] if user_message else 'NONE'}")
-    print(f"DEBUG: Messages count: {len(messages)}")
-    print(f"DEBUG: Last message type: {type(last_message)}")
-    print(f"DEBUG: Last message: {last_message}")
+        user_message = last_message.content
     
     if not user_message:
         # Fallback if no user message found
