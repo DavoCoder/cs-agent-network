@@ -10,6 +10,7 @@ from src.tools.knowledge_base import search_knowledge_base
 from src.utils.confidence import calculate_confidence_score
 from src.utils.risk_assessment import assess_risk, is_high_business_impact
 from src.utils.routing import determine_routing_decision
+from src.utils.message_utils import extract_user_message
 from src.tools.compliance_check import check_compliance_risks, requires_human_oversight
 
 
@@ -33,11 +34,7 @@ def process_technical_ticket(state: ConversationState) -> Command[Literal["human
     messages = state.get("messages", [])
     
     # Extract the latest user message
-    user_message = ""
-    for msg in reversed(messages):
-        if hasattr(msg, "content"):
-            user_message = msg.content
-            break
+    user_message = extract_user_message(messages)
     
     # Search knowledge base
     kb_result = search_knowledge_base("technical", user_message)

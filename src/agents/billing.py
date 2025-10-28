@@ -2,16 +2,18 @@
 Billing Agent for handling billing inquiries using RAG with Pinecone and LLM-based assessments.
 """
 from typing import Literal
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END
 from langgraph.types import Command
 from pydantic import BaseModel, Field
 from src.orchestration.state import ConversationState, AgentContext
-from src.tools.vector_store import retrieve_and_format_kb_results
 from src.utils.routing import determine_routing_decision
+from src.utils.message_utils import extract_user_message
 from src.prompts import load_prompt
+from src.tools.vector_store import retrieve_and_format_kb_results
+from langchain_core.tools import tool
 
 
 class BillingAssessment(BaseModel):
@@ -35,10 +37,67 @@ class BillingAssessment(BaseModel):
     )
 
 
-def process_billing_ticket(state: ConversationState) -> Command[Literal["human_review", END]]:
+@tool
+def search_billing_kb(query: str) -> str:
+    """Search billing knowledge base for relevant information"""
+    result = retrieve_and_format_kb_results(query, "billing")
+    return result if result else "No specific knowledge base articles found."
+
+def process_billing_ticket(state: ConversationState) -> dict:
     """
-    Process a billing support ticket using RAG with Pinecone and LLM-based assessments.
-    Uses Command pattern to return state updates.
+    Process a billing ticket as a ReAct agent that can call tools.
+    Uses LLM with tools to search knowledge base and generate responses.
+    
+    Args:
+        state: Current conversation state
+    
+    Returns:
+        State updates with agent messages
+    """
+    messages = state.get("messages", [])
+    
+    # Load system prompt for billing agent
+    system_prompt = load_prompt("billing_response")
+    if not system_prompt:
+        system_prompt = "You are a billing support agent. Use tools to search knowledge base when needed."
+    
+    # Create LLM with tools bound
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+    llm_with_tools = llm.bind_tools([search_billing_kb])
+    
+    # Build messages with system prompt
+    agent_messages = [SystemMessage(content=system_prompt)] + messages
+    
+    # Invoke LLM
+    response = llm_with_tools.invoke(agent_messages)
+    
+    return {"messages": [response]}
+
+
+def should_continue(state: ConversationState) -> Literal["billing_tools", "billing_assessment"]:
+    """
+    Determines whether to route to tools or to assessment.
+    
+    Args:
+        state: Current conversation state
+    
+    Returns:
+        Next node name
+    """
+    messages = state.get("messages", [])
+    if not messages:
+        return "billing_assessment"
+    
+    last_message = messages[-1]
+    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+        return "billing_tools"
+    else:
+        return "billing_assessment"
+
+
+def process_billing_assessment(state: ConversationState) -> Command[Literal["human_review", END]]:
+    """
+    Assess the billing response and route to human_review or END.
     
     Args:
         state: Current conversation state
@@ -54,24 +113,26 @@ def process_billing_ticket(state: ConversationState) -> Command[Literal["human_r
     
     messages = state.get("messages", [])
     
-    # Extract the latest user message
-    user_message = ""
+    # Extract the final response
+    final_response = None
     for msg in reversed(messages):
-        if hasattr(msg, "content"):
-            user_message = msg.content
+        if isinstance(msg, AIMessage):
+            final_response = msg.content if msg.content else ""
             break
     
-    # Step 1: Retrieve relevant knowledge base articles using RAG
-    kb_context = retrieve_and_format_kb_results(user_message, "billing")
+    if not final_response:
+        return Command(
+            update={"error_message": "No agent response found"}
+        )
     
-    # Step 2: Generate response using RAG
-    response = generate_billing_response(user_message, kb_context, messages)
+    # Extract original user message
+    user_message = extract_user_message(messages)
     
-    # Step 3: Assess the response for risks, compliance, and confidence
+    # Assess the response (kb_context now embedded in messages history)
     assessment = assess_billing_ticket(
         user_message=user_message,
-        ai_response=response,
-        kb_context=kb_context,
+        ai_response=final_response,
+        kb_context="",  # Context is in message history
         ticket_info=current_ticket
     )
     
@@ -86,9 +147,6 @@ def process_billing_ticket(state: ConversationState) -> Command[Literal["human_r
         risk_level=assessment.risk_level,
         agent_contexts=state.get("agent_contexts", [])
     )
-    
-    # Add response message
-    new_message = AIMessage(content=response)
     
     # Update agent context
     agent_context = AgentContext(
@@ -107,7 +165,6 @@ def process_billing_ticket(state: ConversationState) -> Command[Literal["human_r
     
     return Command(
         update={
-            "messages": [new_message],
             "agent_contexts": [agent_context],
             "overall_confidence": overall_confidence,
             "risk_assessment": assessment.risk_level,
@@ -120,15 +177,15 @@ def process_billing_ticket(state: ConversationState) -> Command[Literal["human_r
 def generate_billing_response(
     user_message: str,
     kb_context: str,
-    conversation_history: list  # noqa: ARG001
+    conversation_history: list
 ) -> str:
     """
-    Generate a billing response using RAG.
+    Generate a billing response using RAG with conversation context.
     
     Args:
         user_message: Customer's question
         kb_context: Retrieved knowledge base context
-        conversation_history: Previous messages in conversation (reserved for future use)
+        conversation_history: Previous messages in conversation for context
     
     Returns:
         AI response to the customer
@@ -142,25 +199,29 @@ def generate_billing_response(
         temperature=0.3
     )
     
-    # Build prompt with RAG context
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        ("human", """Customer Question: {user_question}
-
-Context from Knowledge Base:
-{kb_context}
-
-Please provide a helpful response to the customer.""")
-    ])
+    # Get recent conversation context (last 10 messages for context)
+    recent_history = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
     
-    # Format context
+    # Build messages with conversation history
+    messages = []
+    
+    # Add system prompt
+    if system_prompt:
+        messages.append(SystemMessage(content=system_prompt))
+    
+    # Add recent conversation history
+    for msg in recent_history:
+        # Skip adding the current user message as it will be added separately
+        if hasattr(msg, "content"):
+            msg_content = msg.content if isinstance(msg.content, str) else str(msg.content)
+            if msg_content != user_message:
+                # Pass through existing message objects
+                messages.append(msg)
+    
+    # Add current user question with KB context
     formatted_kb = kb_context if kb_context else "No specific knowledge base articles found."
-    
-    # Invoke LLM
-    messages = prompt.format_messages(
-        user_question=user_message,
-        kb_context=formatted_kb
-    )
+    full_user_message = f"{user_message}\n\n[Knowledge Base Context: {formatted_kb}]"
+    messages.append(HumanMessage(content=full_user_message))
     
     response = llm.invoke(messages)
     return response.content

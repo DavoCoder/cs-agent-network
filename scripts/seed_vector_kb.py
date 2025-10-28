@@ -1,7 +1,15 @@
 """
 Script to seed the Pinecone vector database with sample knowledge base articles.
 Run this after setting up your Pinecone account and API key.
+
+Run with: python -m src.scripts.seed_vector_kb
 """
+
+import sys
+from pathlib import Path
+
+# Add project root to path (same as LangGraph does)
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
 from langchain_core.documents import Document

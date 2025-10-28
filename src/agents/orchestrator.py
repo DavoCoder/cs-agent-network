@@ -11,11 +11,12 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from src.orchestration.state import ConversationState
 from src.prompts import load_prompt
+from src.utils.message_utils import extract_user_message
 
 
 class TicketClassification(BaseModel):
     """Structured output for ticket classification"""
-    category: Literal["technical", "billing", "administration"] = Field(
+    category: Literal["technical", "billing", "administration", "unclassifiable"] = Field(
         description="The category of the support request"
     )
     priority: Literal["low", "medium", "high", "urgent"] = Field(
@@ -35,7 +36,25 @@ class TicketClassification(BaseModel):
     )
 
 
-def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical_support", "billing", "administration"]]:
+def _create_message(content: str, messages: list):
+    """Helper to create message in correct format based on message history"""
+    if isinstance(messages, list) and messages and isinstance(messages[0], dict):
+        return {"type": "ai", "content": content}
+    return AIMessage(content=content)
+
+
+def _create_agent_context(classification: TicketClassification) -> dict:
+    """Helper to create agent context from classification"""
+    return {
+        "agent_name": "orchestrator",
+        "confidence_score": classification.confidence,
+        "reasoning": f"Classified as {classification.category}: {classification.intent}",
+        "requires_human_review": classification.needs_human_review,
+        "risk_level": "high" if classification.needs_human_review else "low"
+    }
+
+
+def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical_support", "billing", "administration", END]]:
     """
     Use an LLM to classify the customer's message and determine routing.
     Uses Command pattern to combine state updates with routing.
@@ -50,13 +69,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     messages = state.get("messages", [])
     
     # Extract the human message
-    user_message = ""
-    last_message = None
-    
-    # Try to get the last message
-    if messages:
-        last_message = messages[-1]
-        user_message = last_message.content
+    user_message = extract_user_message(messages)
     
     if not user_message:
         # Fallback if no user message found
@@ -79,11 +92,21 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     # Load system prompt from external file
     system_prompt = load_prompt("ticket_classifier")
     
-    # Create classification prompt
-    classification_messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=f"Customer message: {user_message}")
-    ]
+    # Create classification prompt with conversation context
+    # Get recent conversation history (last 5 messages for classification context)
+    recent_history = messages[-5:] if len(messages) > 5 else messages
+    
+    classification_messages = [SystemMessage(content=system_prompt)]
+    
+    # Add conversation context (skip the current user message as it will be added separately)
+    for msg in recent_history:
+        if hasattr(msg, "content"):
+            msg_content = msg.content if isinstance(msg.content, str) else str(msg.content)
+            if msg_content != user_message:
+                classification_messages.append(msg)
+    
+    # Add current user message
+    classification_messages.append(HumanMessage(content=f"Customer message: {user_message}"))
     
     # Get LLM classification
     try:
@@ -96,6 +119,29 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
                 "routing_history": ["orchestrator: fallback to technical_support"]
             },
             goto="technical_support"  # Default fallback
+        )
+    
+    # Handle unclassifiable questions
+    if classification.category == "unclassifiable":
+        response_message = load_prompt("unclassifiable_response")
+        new_message = _create_message(response_message, messages)
+        
+        agent_context = _create_agent_context(classification)
+        agent_context["reasoning"] = classification.intent
+        agent_context["requires_human_review"] = False
+        agent_context["risk_level"] = "low"
+        
+        return Command(
+            update={
+                "messages": [new_message],
+                "routing_history": [
+                    "orchestrator: classified as unclassifiable (not within scope)"
+                ],
+                "agent_contexts": [agent_context],
+                "overall_confidence": classification.confidence,
+                "pending_human_review": False
+            },
+            goto=END
         )
     
     # Determine next agent based on classification
@@ -116,35 +162,23 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
         "keywords": classification.keywords
     })
     
-    # Add routing message (handle both dict and AIMessage formats)
-    routing_message_content = f"I've analyzed your request and classified it as a {classification.priority} priority {classification.category} issue. " \
-                               f"Let me route you to our {classification.category.replace('_', ' ')} team."
+    # Build state updates
+    updates = {
+        "current_ticket": current_ticket,
+        "routing_history": [
+            f"orchestrator: classified as {classification.category} (priority: {classification.priority}, "
+            f"confidence: {classification.confidence:.2f})"
+        ],
+        "agent_contexts": [_create_agent_context(classification)],
+        "pending_human_review": classification.needs_human_review,
+        "overall_confidence": classification.confidence
+    }
     
-    if isinstance(messages, list) and messages and isinstance(messages[0], dict):
-        # Dict format (from Studio UI) - use 'type' field like Studio expects
-        new_message = {"type": "ai", "content": routing_message_content}
-    else:
-        # AIMessage format
-        new_message = AIMessage(content=routing_message_content)
+    # Don't add any routing message - keep it transparent to the user
+    # The specialized agent will provide the actual response to the user
     
     # Return Command with state updates and routing
     return Command(
-        update={
-            "messages": [new_message],  # Messages reducer will append this
-            "current_ticket": current_ticket,
-            "routing_history": [
-                f"orchestrator: classified as {classification.category} (priority: {classification.priority}, "
-                f"confidence: {classification.confidence:.2f})"
-            ],
-            "agent_contexts": [{
-                "agent_name": "orchestrator",
-                "confidence_score": classification.confidence,
-                "reasoning": f"Classified as {classification.category}: {classification.intent}",
-                "requires_human_review": classification.needs_human_review,
-                "risk_level": "high" if classification.needs_human_review else "low"
-            }],
-            "pending_human_review": classification.needs_human_review,
-            "overall_confidence": classification.confidence
-        },
+        update=updates,
         goto=next_agent
     )
