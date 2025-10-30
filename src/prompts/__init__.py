@@ -1,4 +1,5 @@
 import os
+import asyncio
 from pathlib import Path
 
 
@@ -19,4 +20,13 @@ def load_prompt(prompt_name: str) -> str:
         raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
     
     return prompt_path.read_text(encoding="utf-8")
+
+
+async def aload_prompt(prompt_name: str) -> str:
+    """Asynchronously load a prompt from a file using a thread to avoid blocking the event loop."""
+    prompt_path = get_prompt_path(prompt_name)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+    # Offload blocking I/O to a thread
+    return await asyncio.to_thread(prompt_path.read_text, encoding="utf-8")
 

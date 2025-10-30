@@ -1,3 +1,6 @@
+"""
+Supervisor node that classifies the customer's message and determines routing.
+"""
 from typing import List, Literal
 from pydantic import BaseModel, Field
 from langgraph.graph import END
@@ -7,7 +10,6 @@ from langchain_openai import ChatOpenAI
 from src.state import ConversationState
 from src.prompts import load_prompt
 from src.utils.message_utils import extract_user_message
-
 
 class TicketClassification(BaseModel):
     """Structured output for ticket classification"""
@@ -49,7 +51,7 @@ def _create_agent_context(classification: TicketClassification) -> dict:
     }
 
 
-def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical_support", "billing", "administration", END]]:
+def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical", "billing", "administration", END]]:
     """ Use an LLM to classify the customer's message and determine routing. """
     # Get the latest user message
     messages = state.get("messages", [])
@@ -76,7 +78,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     structured_llm = model.with_structured_output(TicketClassification)
     
     # Load system prompt from external file
-    system_prompt = load_prompt("ticket_classifier")
+    system_prompt = load_prompt("ticket_classifier_system")
     
     # Create classification prompt with conversation context
     # Get recent conversation history (last 5 messages for classification context)
@@ -102,9 +104,9 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
         print(f"Error in LLM classification: {e}")
         return Command(
             update={
-                "routing_history": ["supervisor: fallback to technical_support"]
+                "routing_history": ["supervisor: fallback to technical"]
             },
-            goto="technical_support"  # Default fallback
+            goto="technical"  # Default fallback
         )
     
     # Handle unclassifiable questions

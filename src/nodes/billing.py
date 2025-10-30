@@ -32,14 +32,14 @@ def process_billing_ticket(state: ConversationState) -> dict:
     return {"messages": [response]}
 
 
-def should_continue(state: ConversationState) -> Literal["billing_tools", "billing_assessment"]:
+def should_continue(state: ConversationState) -> Literal["billing_tools", "assessment"]:
     """ Determines whether to route to tools or to assessment. """
     messages = state.get("messages", [])
     if not messages:
-        return "billing_assessment"
+        return "assessment"
     
     last_message = messages[-1]
     if hasattr(last_message, "tool_calls") and last_message.tool_calls:
         return "billing_tools"
     else:
-        return "billing_assessment"
+        return "assessment"

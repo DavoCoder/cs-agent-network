@@ -10,8 +10,8 @@ from src.utils.routing import determine_routing_decision
 from src.utils.message_utils import extract_user_message
 from src.prompts import load_prompt
 
-class BillingAssessment(BaseModel):
-    """Structured output for billing ticket assessment"""
+class Assessment(BaseModel):
+    """Structured output for ticket assessment"""
     confidence_score: float = Field(
         ge=0.0,
         le=1.0,
@@ -31,8 +31,8 @@ class BillingAssessment(BaseModel):
     )
 
 
-def process_billing_assessment(state: ConversationState) -> Command[Literal["human_review", END]]:
-    """ Assess the billing response and route to human_review or END. """
+def process_assessment(state: ConversationState) -> Command[Literal["human_review", END]]:
+    """ Assess the response and route to human_review or END. """
     current_ticket = state.get("current_ticket")
     if not current_ticket:
         return Command(
@@ -55,14 +55,30 @@ def process_billing_assessment(state: ConversationState) -> Command[Literal["hum
     
     # Extract original user message
     user_message = extract_user_message(messages)
+
+    # Load prompts
+    assessment_prompt = load_prompt("assessment_system")
+    human_prompt = load_prompt("assessment_human")
     
-    # Assess the response (kb_context now embedded in messages history)
-    assessment = assess_billing_ticket(
+    # Create LLM with structured output
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
+    structured_llm = llm.with_structured_output(Assessment)
+    
+    # Build assessment prompt
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", assessment_prompt),
+        ("human", human_prompt)
+    ])
+    
+    # Invoke LLM for assessment
+    messages = prompt.format_messages(
         user_message=user_message,
         ai_response=final_response,
-        kb_context="",  # Context is in message history
-        ticket_info=current_ticket
+        priority=current_ticket.get("priority", "medium"),
+        category=current_ticket.get("category", "unclassified")
     )
+    
+    assessment = structured_llm.invoke(messages)
     
     # Determine if human review is needed
     needs_review = assessment.requires_human_review
@@ -78,7 +94,7 @@ def process_billing_assessment(state: ConversationState) -> Command[Literal["hum
     
     # Update agent context
     agent_context = AgentContext(
-        agent_name="billing",
+        agent_name="assessment",
         confidence_score=assessment.confidence_score,
         reasoning=assessment.reasoning,
         requires_human_review=needs_review,
@@ -100,41 +116,3 @@ def process_billing_assessment(state: ConversationState) -> Command[Literal["hum
         },
         goto=goto
     )
-
-
-def assess_billing_ticket(
-    user_message: str,
-    ai_response: str,
-    kb_context: str,
-    ticket_info: dict
-) -> BillingAssessment:
-    """ Assess the billing ticket and return a BillingAssessment object. """
-    # Load prompts
-    assessment_prompt = load_prompt("billing_assessment_system")
-    human_prompt = load_prompt("billing_assessment_human")
-    
-    # Create LLM with structured output
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.0
-    )
-    structured_llm = llm.with_structured_output(BillingAssessment)
-    
-    # Build assessment prompt
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", assessment_prompt),
-        ("human", human_prompt)
-    ])
-    
-    # Invoke LLM for assessment
-    messages = prompt.format_messages(
-        user_message=user_message,
-        ai_response=ai_response,
-        kb_context=kb_context if kb_context else "None",
-        priority=ticket_info.get("priority", "medium"),
-        category=ticket_info.get("category", "billing")
-    )
-    
-    assessment = structured_llm.invoke(messages)
-    
-    return assessment
