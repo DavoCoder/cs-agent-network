@@ -4,7 +4,7 @@ from langgraph.graph import END
 from langgraph.types import Command
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from src.orchestration.state import ConversationState
+from src.state import ConversationState
 from src.prompts import load_prompt
 from src.utils.message_utils import extract_user_message
 
@@ -41,7 +41,7 @@ def _create_ai_message(content: str, messages: list):
 def _create_agent_context(classification: TicketClassification) -> dict:
     """Helper to create agent context from classification"""
     return {
-        "agent_name": "orchestrator",
+        "agent_name": "supervisor",
         "confidence_score": classification.confidence,
         "reasoning": f"Classified as {classification.category}: {classification.intent}",
         "requires_human_review": classification.needs_human_review,
@@ -102,7 +102,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
         print(f"Error in LLM classification: {e}")
         return Command(
             update={
-                "routing_history": ["orchestrator: fallback to technical_support"]
+                "routing_history": ["supervisor: fallback to technical_support"]
             },
             goto="technical_support"  # Default fallback
         )
@@ -121,7 +121,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
             update={
                 "messages": [new_message],
                 "routing_history": [
-                    "orchestrator: classified as unclassifiable (not within scope)"
+                    "supervisor: classified as unclassifiable (not within scope)"
                 ],
                 "agent_contexts": [agent_context],
                 "overall_confidence": classification.confidence,
@@ -149,19 +149,18 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     })
     
     # Build state updates
+    # Don't add any routing message - keep it transparent to the user
+    # The specialized agent will provide the actual response to the user
     updates = {
         "current_ticket": current_ticket,
         "routing_history": [
-            f"orchestrator: classified as {classification.category} (priority: {classification.priority}, "
+            f"supervisor: classified as {classification.category} (priority: {classification.priority}, "
             f"confidence: {classification.confidence:.2f})"
         ],
         "agent_contexts": [_create_agent_context(classification)],
         "pending_human_review": classification.needs_human_review,
         "overall_confidence": classification.confidence
     }
-    
-    # Don't add any routing message - keep it transparent to the user
-    # The specialized agent will provide the actual response to the user
     
     # Return Command with state updates and routing
     return Command(

@@ -1,13 +1,13 @@
 from typing import Literal
 from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
-from src.orchestration.state import ConversationState
-from src.agents.orchestrator import classify_ticket_with_llm
-from src.agents.technical_support import process_technical_ticket
-from src.agents.billing import process_billing_ticket, should_continue, process_billing_assessment, search_billing_kb
-from src.agents.administration import process_administration_ticket
-from src.agents.human_supervisor import human_review_interrupt, process_human_feedback
-
+from src.state import ConversationState
+from src.nodes.supervisor import classify_ticket_with_llm
+from src.nodes.technical_support import process_technical_ticket
+from src.nodes.billing import process_billing_ticket, should_continue, search_billing_kb
+from src.nodes.billing_assessment import process_billing_assessment
+from src.nodes.administration import process_administration_ticket
+from src.nodes.human_supervisor import human_review_interrupt, process_human_feedback
 
 def create_agent_network():
     """ Create the main agent network graph using LangGraph 1.0. """
@@ -22,9 +22,9 @@ def create_agent_network():
     builder = StateGraph(ConversationState)
     
     # Add nodes for each agent
-    # Orchestrator uses Command with routing
+    # Supervisor uses Command with routing
     builder.add_node(
-        "orchestrator", 
+        "supervisor", 
         classify_ticket_with_llm,
         ends=["technical_support", "billing", "administration"]
     )
@@ -57,7 +57,7 @@ def create_agent_network():
     builder.add_node("process_feedback", process_human_feedback)
    
     # Define workflow edges
-    builder.add_edge(START, "orchestrator")
+    builder.add_edge(START, "supervisor")
     
     # Billing agent ReAct pattern routing
     builder.add_conditional_edges(

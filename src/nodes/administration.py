@@ -2,7 +2,7 @@ from typing import Literal
 from langchain_core.messages import AIMessage
 from langgraph.graph import END
 from langgraph.types import Command
-from src.orchestration.state import ConversationState, AgentContext
+from src.state import ConversationState, AgentContext
 from src.tools.knowledge_base import search_knowledge_base
 from src.utils.confidence import calculate_confidence_score
 from src.utils.risk_assessment import assess_risk, is_high_business_impact

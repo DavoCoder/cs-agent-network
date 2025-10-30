@@ -1,7 +1,7 @@
 from langchain_core.messages import AIMessage, SystemMessage
 from langgraph.graph import END
 from langgraph.types import Command, interrupt
-from src.orchestration.state import ConversationState
+from src.state import ConversationState
 
 
 def human_review_interrupt(state: ConversationState) -> Command:

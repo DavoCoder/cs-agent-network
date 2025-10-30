@@ -11,7 +11,6 @@ try:
 except ImportError:
     PINECONE_AVAILABLE = False
 
-
 class VectorStoreManager:
     """Manager for Pinecone vector store operations."""
     
@@ -91,7 +90,7 @@ class VectorStoreManager:
         category: str,
         metadata: Optional[dict] = None
     ):
-        """ Add documents to the vector store. """
+        
         # Add category metadata to each document
         for doc in documents:
             if doc.metadata is None:

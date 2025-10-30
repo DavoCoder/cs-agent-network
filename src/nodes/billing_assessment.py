@@ -1,16 +1,14 @@
 from typing import Literal
-from langchain_core.messages import AIMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.tools import tool
+from langchain_core.messages import AIMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END
 from langgraph.types import Command
 from pydantic import BaseModel, Field
-from src.orchestration.state import ConversationState, AgentContext
+from src.state import ConversationState, AgentContext
 from src.utils.routing import determine_routing_decision
 from src.utils.message_utils import extract_user_message
 from src.prompts import load_prompt
-from src.tools.vector_store import retrieve_and_format_kb_results
 
 class BillingAssessment(BaseModel):
     """Structured output for billing ticket assessment"""
@@ -31,47 +29,6 @@ class BillingAssessment(BaseModel):
     reasoning: str = Field(
         description="Brief explanation of the assessment"
     )
-
-
-@tool
-def search_billing_kb(query: str) -> str:
-    """Search billing knowledge base for relevant information"""
-    result = retrieve_and_format_kb_results(query, "billing")
-    return result if result else "No specific knowledge base articles found."
-
-def process_billing_ticket(state: ConversationState) -> dict:
-    """ Billing agent that can search the billing knowledge base and generate responses. """
-    messages = state.get("messages", [])
-    
-    # Load system prompt for billing agent
-    system_prompt = load_prompt("billing_response")
-    if not system_prompt:
-        system_prompt = "You are a billing support agent. Use tools to search knowledge base when needed."
-    
-    # Create LLM with tools bound
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
-    llm_with_tools = llm.bind_tools([search_billing_kb])
-    
-    # Build messages with system prompt
-    agent_messages = [SystemMessage(content=system_prompt)] + messages
-    
-    # Invoke LLM
-    response = llm_with_tools.invoke(agent_messages)
-    
-    return {"messages": [response]}
-
-
-def should_continue(state: ConversationState) -> Literal["billing_tools", "billing_assessment"]:
-    """ Determines whether to route to tools or to assessment. """
-    messages = state.get("messages", [])
-    if not messages:
-        return "billing_assessment"
-    
-    last_message = messages[-1]
-    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-        return "billing_tools"
-    else:
-        return "billing_assessment"
 
 
 def process_billing_assessment(state: ConversationState) -> Command[Literal["human_review", END]]:
@@ -151,9 +108,10 @@ def assess_billing_ticket(
     kb_context: str,
     ticket_info: dict
 ) -> BillingAssessment:
-
-    # Load assessment prompt
-    assessment_prompt = load_prompt("billing_assessment")
+    """ Assess the billing ticket and return a BillingAssessment object. """
+    # Load prompts
+    assessment_prompt = load_prompt("billing_assessment_system")
+    human_prompt = load_prompt("billing_assessment_human")
     
     # Create LLM with structured output
     llm = ChatOpenAI(
@@ -165,18 +123,7 @@ def assess_billing_ticket(
     # Build assessment prompt
     prompt = ChatPromptTemplate.from_messages([
         ("system", assessment_prompt),
-        ("human", """Analyze this billing interaction:
-
-Customer Question: {user_message}
-
-AI Response: {ai_response}
-
-Knowledge Base Used: {kb_context}
-
-Ticket Priority: {priority}
-Ticket Category: {category}
-
-Provide your assessment.""")
+        ("human", human_prompt)
     ])
     
     # Invoke LLM for assessment

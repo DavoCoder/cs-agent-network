@@ -1,0 +1,13 @@
+Analyze this billing interaction:
+
+Customer Question: {user_message}
+
+AI Response: {ai_response}
+
+Knowledge Base Used: {kb_context}
+
+Ticket Priority: {priority}
+Ticket Category: {category}
+
+Provide your assessment.
+
