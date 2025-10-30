@@ -1,7 +1,3 @@
-"""
-Confidence scoring utilities for agent responses.
-"""
-
 import os
 from typing import Dict, Any
 

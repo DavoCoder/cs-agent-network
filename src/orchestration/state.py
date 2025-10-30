@@ -1,8 +1,3 @@
-"""
-State schema for the multi-agent customer support system.
-Defines the shared state that persists across agent interactions.
-"""
-
 from typing import Optional, List, Literal
 from typing_extensions import TypedDict, NotRequired, Annotated
 from langgraph.graph import MessagesState

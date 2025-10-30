@@ -1,7 +1,3 @@
-"""
-Administration Agent for handling administrative tasks.
-"""
-
 from typing import Literal
 from langchain_core.messages import AIMessage
 from langgraph.graph import END
@@ -16,16 +12,7 @@ from src.tools.compliance_check import check_compliance_risks, requires_human_ov
 
 
 def process_administration_ticket(state: ConversationState) -> Command[Literal["human_review", END]]:
-    """
-    Process an administration support ticket.
-    Uses Command pattern to return state updates.
-    
-    Args:
-        state: Current conversation state
-    
-    Returns:
-        Command with state updates
-    """
+
     current_ticket = state.get("current_ticket")
     if not current_ticket:
         return Command(

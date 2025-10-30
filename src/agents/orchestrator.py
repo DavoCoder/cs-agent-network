@@ -1,8 +1,3 @@
-"""
-Orchestrator agent that routes tickets to appropriate specialized agents.
-Uses an LLM to classify and understand the intent of the customer message.
-"""
-
 from typing import List, Literal
 from pydantic import BaseModel, Field
 from langgraph.graph import END
@@ -36,7 +31,7 @@ class TicketClassification(BaseModel):
     )
 
 
-def _create_message(content: str, messages: list):
+def _create_ai_message(content: str, messages: list):
     """Helper to create message in correct format based on message history"""
     if isinstance(messages, list) and messages and isinstance(messages[0], dict):
         return {"type": "ai", "content": content}
@@ -55,16 +50,7 @@ def _create_agent_context(classification: TicketClassification) -> dict:
 
 
 def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical_support", "billing", "administration", END]]:
-    """
-    Use an LLM to classify the customer's message and determine routing.
-    Uses Command pattern to combine state updates with routing.
-    
-    Args:
-        state: Current conversation state
-    
-    Returns:
-        Command with state updates and next node to route to
-    """
+    """ Use an LLM to classify the customer's message and determine routing. """
     # Get the latest user message
     messages = state.get("messages", [])
     
@@ -124,7 +110,7 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     # Handle unclassifiable questions
     if classification.category == "unclassifiable":
         response_message = load_prompt("unclassifiable_response")
-        new_message = _create_message(response_message, messages)
+        new_message = _create_ai_message(response_message, messages)
         
         agent_context = _create_agent_context(classification)
         agent_context["reasoning"] = classification.intent

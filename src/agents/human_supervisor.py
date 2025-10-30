@@ -1,7 +1,3 @@
-"""
-Human Supervisor Agent for handling human-in-the-loop workflows.
-"""
-
 from langchain_core.messages import AIMessage, SystemMessage
 from langgraph.graph import END
 from langgraph.types import Command, interrupt
@@ -9,16 +5,7 @@ from src.orchestration.state import ConversationState
 
 
 def human_review_interrupt(state: ConversationState) -> Command:
-    """
-    Interrupt the workflow for human review.
-    Uses Command pattern to return state updates.
-    
-    Args:
-        state: Current conversation state
-    
-    Returns:
-        Command with state updates
-    """
+
     # Generate summary for human reviewer
     current_ticket = state.get("current_ticket")
     agent_contexts = state.get("agent_contexts", [])
@@ -74,16 +61,7 @@ def human_review_interrupt(state: ConversationState) -> Command:
  
 
 def process_human_feedback(state: ConversationState) -> Command:
-    """
-    Process human feedback and resume workflow.
-    Uses Command pattern to return state updates.
-    
-    Args:
-        state: Current conversation state
-    
-    Returns:
-        Command with state updates
-    """
+
     human_feedback = state.get("human_feedback")
     
     if not human_feedback:
@@ -103,15 +81,6 @@ def process_human_feedback(state: ConversationState) -> Command:
 
 
 def should_resume_automatically(state: ConversationState) -> bool:
-    """
-    Determine if workflow should resume automatically after human review.
-    
-    Args:
-        state: Current conversation state
-    
-    Returns:
-        True if can resume automatically
-    """
     human_feedback = state.get("human_feedback", "")
     
     # Resume automatically if human approves

@@ -1,7 +1,3 @@
-"""
-Utility functions for extracting and processing messages from conversation state.
-"""
-
 from langchain_core.messages import HumanMessage
 
 

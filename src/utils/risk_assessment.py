@@ -1,7 +1,3 @@
-"""
-Risk assessment utilities for detecting high-risk scenarios.
-"""
-
 from typing import Dict, Any, Literal
 
 

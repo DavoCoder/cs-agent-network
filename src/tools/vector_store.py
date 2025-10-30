@@ -1,7 +1,3 @@
-"""
-Vector store tools for RAG (Retrieval-Augmented Generation) using Pinecone.
-"""
-
 import os
 from typing import List, Optional
 from langchain_core.documents import Document
@@ -24,13 +20,7 @@ class VectorStoreManager:
         index_name: str = "customer-support-kb",
         dimension: int = 1536
     ):
-        """
-        Initialize the vector store manager.
-        
-        Args:
-            index_name: Name of the Pinecone index
-            dimension: Embedding dimension (1536 for OpenAI ada-002)
-        """
+        """ Initialize the vector store manager. """
         if not PINECONE_AVAILABLE:
             raise ImportError("Pinecone packages not installed. Install with: pip install pinecone-client langchain-pinecone")
         
@@ -80,18 +70,7 @@ class VectorStoreManager:
         k: int = 3,
         metadata_filter: Optional[dict] = None
     ) -> List[Document]:
-        """
-        Search for relevant documents using semantic search.
-        
-        Args:
-            query: Search query
-            category: Category filter (billing, technical, administration)
-            k: Number of results to return
-            metadata_filter: Additional metadata filters
-        
-        Returns:
-            List of relevant documents
-        """
+        """ Search for relevant documents using semantic search. """
         # Add category to metadata_filter
         search_filter = {"category": category}
         if metadata_filter:
@@ -112,14 +91,7 @@ class VectorStoreManager:
         category: str,
         metadata: Optional[dict] = None
     ):
-        """
-        Add documents to the vector store.
-        
-        Args:
-            documents: List of Document objects to add
-            category: Category of documents
-            metadata: Additional metadata to attach
-        """
+        """ Add documents to the vector store. """
         # Add category metadata to each document
         for doc in documents:
             if doc.metadata is None:
@@ -137,14 +109,7 @@ class VectorStoreManager:
         metadatas: List[dict],
         category: str
     ):
-        """
-        Add texts directly to the vector store.
-        
-        Args:
-            texts: List of text strings
-            metadatas: List of metadata dictionaries
-            category: Category of texts
-        """
+        """ Add texts directly to the vector store. """
         # Add category to each metadata
         for meta in metadatas:
             meta["category"] = category
@@ -179,17 +144,7 @@ def search_vector_kb(
     category: str,
     k: int = 3
 ) -> List[Document]:
-    """
-    Search the vector knowledge base for relevant information.
-    
-    Args:
-        query: Search query
-        category: Category to search
-        k: Number of results
-    
-    Returns:
-        List of relevant documents
-    """
+    """ Search the vector knowledge base for relevant information. """
     vector_store = get_vector_store()
     if vector_store is None:
         return []
@@ -197,16 +152,7 @@ def search_vector_kb(
 
 
 def retrieve_and_format_kb_results(query: str, category: str) -> Optional[str]:
-    """
-    Retrieve knowledge base articles and format them for LLM context.
-    
-    Args:
-        query: Customer query
-        category: Search category
-    
-    Returns:
-        Formatted context string or None if no results
-    """
+    """ Retrieve knowledge base articles and format them for LLM context. """
     try:
         docs = search_vector_kb(query, category, k=3)
         

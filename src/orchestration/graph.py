@@ -1,8 +1,3 @@
-"""
-Main orchestration graph using LangGraph 1.0.
-Defines the workflow for the multi-agent customer support system.
-"""
-
 from typing import Literal
 from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
@@ -15,20 +10,10 @@ from src.agents.human_supervisor import human_review_interrupt, process_human_fe
 
 
 def create_agent_network():
-    """
-    Create the main agent network graph using LangGraph 1.0.
-    Uses Command pattern for state updates and routing.
-    
-    Returns:
-        Compiled LangGraph StateGraph
-    """
-    
+    """ Create the main agent network graph using LangGraph 1.0. """
     # Conditional routing function after human review
     def route_after_human_review(state: ConversationState) -> Literal["process_feedback", "end"]:
-        """
-        Route after human review interruption.
-        Checks if there's human feedback to process.
-        """
+        """ Route after human review interruption. Checks if there's human feedback to process. """
         return "process_feedback" if state.get("human_feedback") else "end"
     
     billing_tools_node = ToolNode([search_billing_kb])
