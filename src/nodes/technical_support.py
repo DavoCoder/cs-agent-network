@@ -7,7 +7,6 @@ from langchain_core.messages import SystemMessage
 from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.graph import END
 from src.state import ConversationState
 from src.prompts import aload_prompt
 
@@ -25,6 +24,8 @@ async def get_mcp_tools() -> list[Tool]:
         }
     )
     tools = await client.get_tools()
+    print(f"************Tools: {tools}")
+
     return tools
 
 async def process_technical_ticket(state: ConversationState) -> dict:

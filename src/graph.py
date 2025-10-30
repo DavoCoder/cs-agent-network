@@ -1,4 +1,8 @@
+"""
+Customer support agent network graph using LangGraph 1.0.
+"""
 from typing import Literal
+
 from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
 from src.state import ConversationState
@@ -14,7 +18,11 @@ from src.nodes.billing import (
     search_billing_kb,
 )
 from src.nodes.assessment import process_assessment
-from src.nodes.administration import process_administration_ticket
+from src.nodes.administration import (
+    process_administration_ticket,
+    should_continue as admin_should_continue,
+    a2a_admin_action,
+)
 from src.nodes.human_supervisor import human_review_interrupt, process_human_feedback
 
 async def create_agent_network():
@@ -23,10 +31,11 @@ async def create_agent_network():
     def route_after_human_review(state: ConversationState) -> Literal["process_feedback", "end"]:
         """ Route after human review interruption. Checks if there's human feedback to process. """
         return "process_feedback" if state.get("human_feedback") else "end"
-    
-    tools = await get_mcp_tools()
+
+    tech_tools = await get_mcp_tools()
     billing_tools_node = ToolNode([search_billing_kb])
-    technical_tools_node = ToolNode(tools)
+    technical_tools_node = ToolNode(tech_tools)
+    admin_tools_node = ToolNode([a2a_admin_action])
     
     # Create the graph builder
     builder = StateGraph(ConversationState)
@@ -39,27 +48,18 @@ async def create_agent_network():
         ends=["technical", "billing", "administration"]
     )
     
-    # Technical support agent
-    builder.add_node(
-        "technical", 
-        process_technical_ticket,
-        ends=["human_review", END]
-    )
+    builder.add_node("technical", process_technical_ticket)
     builder.add_node("technical_tools", technical_tools_node)
     
-    # Billing agent with ReAct pattern
     builder.add_node("billing", process_billing_ticket)
     builder.add_node("billing_tools", billing_tools_node)
+
+    builder.add_node("administration",  process_administration_ticket)
+    builder.add_node("admin_tools", admin_tools_node)
+    
     builder.add_node(
         "assessment",
         process_assessment,
-        ends=["human_review", END]
-    )
-    
-    # Administration agent
-    builder.add_node(
-        "administration", 
-        process_administration_ticket,
         ends=["human_review", END]
     )
     
@@ -89,10 +89,21 @@ async def create_agent_network():
             "assessment": "assessment"
         }
     )
+
+    # Administration agent routing
+    builder.add_conditional_edges(
+        "administration",
+        admin_should_continue,
+        {
+            "admin_tools": "admin_tools",
+            "assessment": "assessment",
+        }
+    )
     
     # Tools complete, loop back to agent
     builder.add_edge("billing_tools", "billing")
     builder.add_edge("technical_tools", "technical")
+    builder.add_edge("admin_tools", "administration")
     
     # Human review routing
     builder.add_conditional_edges(

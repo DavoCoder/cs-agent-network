@@ -1,4 +1,4 @@
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Dict
 from typing_extensions import TypedDict, NotRequired, Annotated
 from langgraph.graph import MessagesState
 
@@ -50,3 +50,6 @@ class ConversationState(MessagesState):
     # Confidence and risk tracking
     overall_confidence: NotRequired[float]
     risk_assessment: NotRequired[Optional[str]]
+    # Tool call tracking (generic across agents)
+    tool_call_counts: NotRequired[Dict[str, int]]
+    tool_call_limits: NotRequired[Dict[str, int]]
