@@ -5,11 +5,13 @@ from typing import List, Literal
 from pydantic import BaseModel, Field
 from langgraph.graph import END
 from langgraph.types import Command
+from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
+from src.utils.models import load_chat_model
 from src.state import ConversationState
 from src.prompts import load_prompt
 from src.utils.message_utils import extract_user_message
+from src.configuration import Configuration
 
 class TicketClassification(BaseModel):
     """Structured output for ticket classification"""
@@ -51,7 +53,8 @@ def _create_agent_context(classification: TicketClassification) -> dict:
     }
 
 
-def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["technical", "billing", "administration", END]]:
+def classify_ticket_with_llm(state: ConversationState, 
+    runtime: RunnableConfig[Configuration]) -> Command[Literal["technical", "billing", "administration", END]]:
     """ Use an LLM to classify the customer's message and determine routing. """
     # Get the latest user message
     messages = state.get("messages", [])
@@ -68,19 +71,17 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
             goto=END  # Default 
         )
     
-    # Initialize the LLM for classification
-    model = ChatOpenAI(
-        model="gpt-4o-mini",  # Use cost-effective model for classification
-        temperature=0.0,  # Deterministic classification
+    config = runtime.context if runtime.context else Configuration()
+
+    model = load_chat_model(
+        config.supervisor_model,
+        config.supervisor_temperature
     )
     
-    # Create structured output parser
     structured_llm = model.with_structured_output(TicketClassification)
     
-    # Load system prompt from external file
-    system_prompt = load_prompt("ticket_classifier_system")
+    system_prompt = config.supervisor_system_prompt
     
-    # Create classification prompt with conversation context
     # Get recent conversation history (last 5 messages for classification context)
     recent_history = messages[-5:] if len(messages) > 5 else messages
     
@@ -96,7 +97,6 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     # Add current user message
     classification_messages.append(HumanMessage(content=f"Customer message: {user_message}"))
     
-    # Get LLM classification
     try:
         classification = structured_llm.invoke(classification_messages)
     except Exception as e:  # noqa: E722
@@ -151,7 +151,6 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
     })
     
     # Build state updates
-    # Don't add any routing message - keep it transparent to the user
     # The specialized agent will provide the actual response to the user
     updates = {
         "current_ticket": current_ticket,
@@ -164,7 +163,6 @@ def classify_ticket_with_llm(state: ConversationState) -> Command[Literal["techn
         "overall_confidence": classification.confidence
     }
     
-    # Return Command with state updates and routing
     return Command(
         update=updates,
         goto=next_agent

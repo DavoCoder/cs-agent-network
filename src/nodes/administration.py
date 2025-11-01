@@ -4,12 +4,14 @@ Administration node that uses an external A2A client tool for admin tasks.
 from typing import Literal
 import os
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
 import httpx
 from src.state import ConversationState
 from src.prompts import aload_prompt
+from src.configuration import Configuration
 from src.utils.a2a_client import build_a2a_jsonrpc_request, parse_a2a_jsonrpc_response
+from src.utils.models import load_chat_model
 
 
 @tool
@@ -45,17 +47,20 @@ async def a2a_admin_action(query: str) -> str:
         return parse_a2a_jsonrpc_response(resp.json())
 
 
-async def process_administration_ticket(state: ConversationState) -> dict:
+async def process_administration_ticket(state: ConversationState, runtime: RunnableConfig[Configuration]) -> dict:
     """Administration agent that uses an external A2A client tool for admin tasks."""
     print("************Processing Administration Ticket!!!!!!!!!!!!!")
     messages = state.get("messages", [])
+
+    # runtime.context is a Configuration instance, so access attributes directly
+    config = runtime.context if runtime.context else Configuration()
 
     # Initialize and check tool-call limits for this agent
     agent_key = "administration"
     tool_call_counts = state.get("tool_call_counts", {}) or {}
     tool_call_limits = state.get("tool_call_limits", {}) or {}
-    # Default limit from env; falls back to 1 if not set
-    default_limit = int(os.getenv("ADMIN_TOOL_CALL_LIMIT", os.getenv("GLOBAL_TOOL_CALL_LIMIT", "1")))
+    # Default limit from config; falls back to 1 if not set
+    default_limit = config.administration_tool_call_limit or config.global_tool_call_limit or 1
     current_count = int(tool_call_counts.get(agent_key, 0))
     limit = int(tool_call_limits.get(agent_key, default_limit))
     if current_count >= limit:
@@ -63,9 +68,13 @@ async def process_administration_ticket(state: ConversationState) -> dict:
         print(f"Admin tool-call limit reached ({current_count}/{limit}); skipping tool binding.")
         return {"messages": []}
 
-    system_prompt = await aload_prompt("administration_agent_system")
+    # Load system prompt
+    system_prompt = config.administration_system_prompt
 
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
+    # Create LLM with tools bound
+    model_name = config.administration_model
+    temperature = config.administration_temperature
+    llm = load_chat_model(model_name, temperature=temperature)
     tools = [a2a_admin_action]
     print("************A2A Tools:", tools)
     # Force the model to call the A2A tool with arguments
@@ -83,14 +92,19 @@ async def process_administration_ticket(state: ConversationState) -> dict:
 
     return {"messages": [response]}
 
-def should_continue(state: ConversationState) -> Literal["admin_tools", "assessment"]:
+def should_continue(state: ConversationState, runtime: RunnableConfig[Configuration] | None = None) -> Literal["admin_tools", "assessment"]:
     """Determines whether to route to tools or to assessment for administration."""
     messages = state.get("messages", [])
     # Enforce configurable limit
     agent_key = "administration"
     tool_call_counts = state.get("tool_call_counts", {}) or {}
     tool_call_limits = state.get("tool_call_limits", {}) or {}
-    default_limit = int(os.getenv("ADMIN_TOOL_CALL_LIMIT", os.getenv("GLOBAL_TOOL_CALL_LIMIT", "1")))
+    # Get default limit from config or env; falls back to 1 if not set
+    if runtime and runtime.context:
+        config = runtime.context
+        default_limit = config.administration_tool_call_limit or config.global_tool_call_limit or 1
+    else:
+        default_limit = int(os.getenv("ADMIN_TOOL_CALL_LIMIT", os.getenv("GLOBAL_TOOL_CALL_LIMIT", "1")))
     current_count = int(tool_call_counts.get(agent_key, 0))
     limit = int(tool_call_limits.get(agent_key, default_limit))
     if current_count >= limit:

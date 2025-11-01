@@ -2,10 +2,11 @@
 Customer support agent network graph using LangGraph 1.0.
 """
 from typing import Literal
-
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
 from src.state import ConversationState
+from src.configuration import Configuration
 from src.nodes.supervisor import classify_ticket_with_llm
 from src.nodes.technical_support import (
     process_technical_ticket,
@@ -25,7 +26,7 @@ from src.nodes.administration import (
 )
 from src.nodes.human_supervisor import human_review_interrupt, process_human_feedback
 
-async def create_agent_network():
+async def create_agent_network(config: RunnableConfig):
     """ Create the main agent network graph using LangGraph 1.0. """
     # Conditional routing function after human review
     def route_after_human_review(state: ConversationState) -> Literal["process_feedback", "end"]:
@@ -38,7 +39,7 @@ async def create_agent_network():
     admin_tools_node = ToolNode([a2a_admin_action])
     
     # Create the graph builder
-    builder = StateGraph(ConversationState)
+    builder = StateGraph(ConversationState, context_schema=Configuration)
     
     # Add nodes for each agent
     # Supervisor uses Command with routing

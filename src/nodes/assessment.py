@@ -1,13 +1,15 @@
 from typing import Literal
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage
-from langchain_openai import ChatOpenAI
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 from langgraph.types import Command
 from pydantic import BaseModel, Field
 from src.state import ConversationState, AgentContext
 from src.utils.routing import determine_routing_decision
 from src.utils.message_utils import extract_user_message
+from src.configuration import Configuration
+from src.utils.models import load_chat_model
 from src.prompts import load_prompt
 
 class Assessment(BaseModel):
@@ -31,7 +33,7 @@ class Assessment(BaseModel):
     )
 
 
-def process_assessment(state: ConversationState) -> Command[Literal["human_review", END]]:
+def process_assessment(state: ConversationState, runtime: RunnableConfig[Configuration]) -> Command[Literal["human_review", END]]:
     """ Assess the response and route to human_review or END. """
     current_ticket = state.get("current_ticket")
     if not current_ticket:
@@ -56,12 +58,17 @@ def process_assessment(state: ConversationState) -> Command[Literal["human_revie
     # Extract original user message
     user_message = extract_user_message(messages)
 
+    # runtime.context is a Configuration instance, so access attributes directly
+    config = runtime.context if runtime.context else Configuration()
+
     # Load prompts
-    assessment_prompt = load_prompt("assessment_system")
-    human_prompt = load_prompt("assessment_human")
+    assessment_prompt = config.assessment_system_prompt
+    human_prompt = load_prompt("assessment_human")  # Keep using load_prompt for the human template
     
     # Create LLM with structured output
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
+    model_name = config.assessment_model
+    temperature = config.assessment_temperature
+    llm = load_chat_model(model_name, temperature=temperature)
     structured_llm = llm.with_structured_output(Assessment)
     
     # Build assessment prompt
