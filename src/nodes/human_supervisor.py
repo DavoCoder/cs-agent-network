@@ -1,7 +1,6 @@
 """
 Human supervisor node that handles human review and feedback.
 """
-import json
 import logging
 from typing import Literal
 
@@ -17,22 +16,8 @@ logger = logging.getLogger(__name__)
 def _extract_a2a_response(tool_message: ToolMessage) -> str:
     """Extract text response from A2A tool message."""
     content = tool_message.content
+    # Tool now returns extracted text string directly, no parsing needed
     if isinstance(content, str):
-        try:
-            # Try to parse as JSON and extract response text
-            result_dict = json.loads(content)
-            if isinstance(result_dict, dict):
-                # Extract from result.parts[0].text if it's an A2A response
-                result = result_dict.get("result", {})
-                if isinstance(result, dict):
-                    parts = result.get("parts", [])
-                    if parts and isinstance(parts[0], dict):
-                        text = parts[0].get("text", "")
-                        if text:
-                            return text
-        except (json.JSONDecodeError, KeyError, TypeError):
-            pass
-        # Fallback to string content
         return content
     return str(content)
 
@@ -44,7 +29,6 @@ def human_review_interrupt(state: ConversationState) -> Command:
     # Check if this is an admin tool response that needs confirmation
     admin_tool_response = None
     admin_original_query = None
-    tool_call_id = None
     
     # Find the most recent ToolMessage from admin tool
     for msg in reversed(messages[-10:]):  # Check last 10 messages
@@ -53,17 +37,22 @@ def human_review_interrupt(state: ConversationState) -> Command:
             if "call_external_admin_a2a_agent" in tool_name or "a2a" in tool_name.lower():
                 admin_tool_response = _extract_a2a_response(msg)
                 tool_call_id = getattr(msg, "tool_call_id", None)
-                # Find the original query that triggered this tool call
-                # Look backwards for the tool call or user message
-                for prev_msg in reversed(messages[:messages.index(msg)]):
+                
+                # Find the original query - look for tool call with matching ID, then fallback to user message
+                for prev_msg in reversed(messages):
+                    if prev_msg == msg:
+                        continue  # Skip the ToolMessage itself
                     if hasattr(prev_msg, "tool_calls") and prev_msg.tool_calls:
                         for tool_call in prev_msg.tool_calls:
                             if tool_call.get("id") == tool_call_id:
                                 admin_original_query = tool_call.get("args", {}).get("query", "")
                                 break
+                        if admin_original_query:
+                            break
                     if isinstance(prev_msg, HumanMessage):
                         admin_original_query = extract_user_message([prev_msg])
-                        break
+                        if admin_original_query:
+                            break
                 break
     
     # If this is an admin tool response, handle it specially
@@ -180,35 +169,20 @@ def process_human_feedback(state: ConversationState) -> Command:
                     "messages": [
                         AIMessage(content="Administrative action cancelled as requested.")
                     ]
-                },
-                goto="assessment"
+                }
+                # Route via conditional edges (route_after_feedback) to assessment
             )
         
-        if is_confirmed:
-            logger.info('Admin action confirmed, preparing second tool call')
-            # User confirmed - prepare message for second tool call
-            # Combine original query with confirmation and any additional info
-            original_query = state.get("admin_original_query", "")
-            
-            # Create a confirmation message that will trigger the second tool call
-            confirmation_message = f"{original_query}\n\nUser confirmed: {human_feedback}"
-            
-            return Command(
-                update={
-                    "messages": [
-                        HumanMessage(content=confirmation_message)
-                    ],
-                    "admin_confirmation_pending": False,
-                    "pending_human_review": False,
-                    # Keep admin_tool_response for reference but clear confirmation flag
-                },
-                goto="administration"  # Go back to admin agent to process confirmation
-            )
-        
-        # Neither confirmed nor cancelled - treat as additional info and proceed
-        logger.info('Admin action feedback received, treating as confirmation with additional info')
+        # Confirmed or additional info - prepare message for second tool call
+        logger.info('Admin action confirmed or additional info provided, preparing second tool call')
         original_query = state.get("admin_original_query", "")
-        confirmation_message = f"{original_query}\n\nUser response: {human_feedback}"
+        
+        # Create a confirmation message that will trigger the second tool call
+        if is_confirmed:
+            confirmation_message = f"{original_query}\n\nUser confirmed: {human_feedback}"
+        else:
+            # Treat as additional info/confirmation
+            confirmation_message = f"{original_query}\n\nUser response: {human_feedback}"
         
         return Command(
             update={
@@ -217,8 +191,9 @@ def process_human_feedback(state: ConversationState) -> Command:
                 ],
                 "admin_confirmation_pending": False,
                 "pending_human_review": False,
-            },
-            goto="administration"
+                # Keep admin_tool_response for reference but clear confirmation flag
+            }
+            # Route via conditional edges (route_after_feedback) to administration
         )
     
     # Default behavior for other feedback
@@ -233,16 +208,6 @@ def process_human_feedback(state: ConversationState) -> Command:
         }
     )
 
-
-def should_resume_automatically(state: ConversationState) -> bool:
-    """Determine if the workflow should resume automatically."""
-    human_feedback = state.get("human_feedback", "")
-    
-    # Resume automatically if human approves
-    if human_feedback.lower() in ["approve", "ok", "approved", "yes"]:
-        return True
-    
-    return False
 
 # Process feedback routes based on context
 def route_after_feedback(state: ConversationState) -> Literal["administration", "assessment"]:

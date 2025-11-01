@@ -60,7 +60,7 @@ async def create_agent_network(config: RunnableConfig):
     builder.add_node(
         "assessment",
         process_assessment,
-        ends=["human_review", END]
+        ends=[END]  # Assessment always routes to END via Command.goto
     )
     
     # Human supervisor nodes

@@ -11,8 +11,8 @@ from src.utils.models import load_chat_model
 from src.schemas.assessment import Assessment
 
 
-def process_assessment(state: ConversationState, runtime: RunnableConfig[Configuration]) -> Command[Literal["human_review", END]]:
-    """ Assess the response and route to human_review or END. """
+def process_assessment(state: ConversationState, runtime: RunnableConfig[Configuration]) -> Command[Literal[END]]:
+    """ Assess the response and route to END. """
     current_ticket = state.get("current_ticket")
     if not current_ticket:
         return Command(
@@ -58,15 +58,12 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
     
     assessment = structured_llm.invoke(messages)
     
-    # Determine if further human review is needed
-    needs_review = assessment.requires_human_review
-    
     # Update agent context
     agent_context = AgentContext(
         agent_name="assessment",
         confidence_score=assessment.confidence_score,
         reasoning=assessment.reasoning,
-        requires_human_review=needs_review,
+        requires_human_review=assessment.requires_human_review,
         risk_level=assessment.risk_level
     )
     
@@ -81,7 +78,7 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
             "agent_contexts": [agent_context],
             "overall_confidence": overall_confidence,
             "risk_assessment": assessment.risk_level,
-            "pending_human_review": needs_review
+            "pending_human_review": assessment.requires_human_review
         },
         goto=END
     )

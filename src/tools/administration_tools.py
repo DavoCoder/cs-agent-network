@@ -18,6 +18,56 @@ from a2a.utils.constants import (
     EXTENDED_AGENT_CARD_PATH,
 )
 
+logger = logging.getLogger(__name__)
+
+
+def _extract_text_from_a2a_response(response_dict: dict[str, Any]) -> str:
+    """
+    Extract text content from A2A response structure.
+    
+    The A2A response has the structure:
+    {
+        "id": "...",
+        "jsonrpc": "2.0",
+        "result": {
+            "kind": "message",
+            "messageId": "...",
+            "parts": [
+                {"kind": "text", "text": "actual response text here"}
+            ],
+            "role": "agent"
+        }
+    }
+    
+    Args:
+        response_dict: The A2A response dictionary
+        
+    Returns:
+        Extracted text string from result.parts[0].text, or fallback representation
+    """
+    try:
+        result = response_dict.get("result", {})
+        if isinstance(result, dict):
+            parts = result.get("parts", [])
+            if parts and isinstance(parts[0], dict):
+                # Find the first text part
+                for part in parts:
+                    if part.get("kind") == "text" and "text" in part:
+                        text = part.get("text", "")
+                        if text:
+                            return text
+                
+                # Fallback: if no text part found, try first part anyway
+                if parts[0].get("text"):
+                    return parts[0].get("text", "")
+        
+        # If we can't extract text, return a string representation
+        logger.warning('Could not extract text from A2A response, using fallback')
+        return str(response_dict)
+    except (KeyError, TypeError, AttributeError) as e:
+        logger.warning('Error extracting text from A2A response: %s', e)
+        return str(response_dict)
+
 @tool
 async def call_external_admin_a2a_agent(query: str) -> str:
     """
@@ -33,10 +83,6 @@ async def call_external_admin_a2a_agent(query: str) -> str:
     Returns:
         The agent's response as a string or JSON dict
     """
-    # Configure logging to show INFO level messages
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)  # Get a logger instance
-
     port = int(os.getenv('A2A_SERVER_PORT', '9999'))
     host = os.getenv('A2A_SERVER_HOST', '127.0.0.1')
 
@@ -144,7 +190,15 @@ async def call_external_admin_a2a_agent(query: str) -> str:
         )
 
         response = await client.send_message(request)
-        print(response.model_dump(mode='json', exclude_none=True))
-        logger.info(response.model_dump(mode='json', exclude_none=True))
-        return response.model_dump(mode='json', exclude_none=True)
+        
+        # Convert response to dict for parsing
+        response_dict = response.model_dump(mode='json', exclude_none=True)
+        
+        # Extract text from A2A response structure
+        extracted_text = _extract_text_from_a2a_response(response_dict)
+        
+        logger.info('A2A agent response extracted: %s', extracted_text[:100] if len(extracted_text) > 100 else extracted_text)
+        
+        # Return the extracted text instead of raw JSON
+        return extracted_text
 
