@@ -5,7 +5,6 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 from langgraph.types import Command
 from src.state import ConversationState, AgentContext
-from src.utils.routing import determine_routing_decision
 from src.utils.message_utils import extract_user_message
 from src.configuration import Configuration
 from src.utils.models import load_chat_model
@@ -59,17 +58,8 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
     
     assessment = structured_llm.invoke(messages)
     
-    # Determine if human review is needed
+    # Determine if further human review is needed
     needs_review = assessment.requires_human_review
-    
-    # Determine where to route next using shared routing logic
-    goto = determine_routing_decision(
-        state=state,
-        needs_review=needs_review,
-        overall_confidence=assessment.confidence_score,
-        risk_level=assessment.risk_level,
-        agent_contexts=state.get("agent_contexts", [])
-    )
     
     # Update agent context
     agent_context = AgentContext(
@@ -93,5 +83,5 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
             "risk_assessment": assessment.risk_level,
             "pending_human_review": needs_review
         },
-        goto=goto
+        goto=END
     )

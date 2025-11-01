@@ -3,7 +3,8 @@
     "."
   ],
   "graphs": {
-    "customer_support_agent_network": "./src/graph.py:create_agent_network"
+    "customer_support_agent_network": "./src/graph.py:create_agent_network",
+    "supervisor_agent_alternative": "./src/graph_alternative.py:build_supervisor_graph"
   },
   "env": ".env",
   "python_version": "3.11"

@@ -53,3 +53,7 @@ class ConversationState(MessagesState):
     # Tool call tracking (generic across agents)
     tool_call_counts: NotRequired[Dict[str, int]]
     tool_call_limits: NotRequired[Dict[str, int]]
+    # Admin agent confirmation tracking
+    admin_tool_response: NotRequired[Optional[str]]  # Stores A2A agent response for human review
+    admin_confirmation_pending: NotRequired[bool]  # True when waiting for user confirmation
+    admin_original_query: NotRequired[Optional[str]]  # Original user query that triggered admin tool

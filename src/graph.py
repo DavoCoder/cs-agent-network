@@ -1,7 +1,6 @@
 """
 Customer support agent network graph using LangGraph 1.0.
 """
-from typing import Literal
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
@@ -22,22 +21,21 @@ from src.nodes.assessment import process_assessment
 from src.nodes.administration import (
     process_administration_ticket,
     should_continue as admin_should_continue,
-    a2a_admin_action,
 )
-from src.nodes.human_supervisor import human_review_interrupt, process_human_feedback
+from src.tools.administration_tools import call_external_admin_a2a_agent
+from src.nodes.human_supervisor import ( 
+    human_review_interrupt, 
+    process_human_feedback, 
+    route_after_feedback
+)
 
 async def create_agent_network(config: RunnableConfig):
     """ Create the main agent network graph using LangGraph 1.0. """
-    
-    # Conditional routing function after human review
-    def route_after_human_review(state: ConversationState) -> Literal["process_feedback", "end"]:
-        """ Route after human review interruption. Checks if there's human feedback to process. """
-        return "process_feedback" if state.get("human_feedback") else "end"
 
     tech_tools = await get_mcp_tools()
     billing_tools_node = ToolNode([search_billing_kb])
     technical_tools_node = ToolNode(tech_tools)
-    admin_tools_node = ToolNode([a2a_admin_action])
+    admin_tools_node = ToolNode([call_external_admin_a2a_agent])
     
     # Create the graph builder
     builder = StateGraph(ConversationState, context_schema=Configuration)
@@ -105,20 +103,19 @@ async def create_agent_network(config: RunnableConfig):
     # Tools complete, loop back to agent
     builder.add_edge("billing_tools", "billing")
     builder.add_edge("technical_tools", "technical")
-    builder.add_edge("admin_tools", "administration")
+    # Admin tools always goes to human_review for confirmation after tool execution
+    builder.add_edge("admin_tools", "human_review")
     
-    # Human review routing
+    builder.add_edge("human_review", "process_feedback")
+    
     builder.add_conditional_edges(
-        "human_review",
-        route_after_human_review,
+        "process_feedback",
+        route_after_feedback,
         {
-            "process_feedback": "process_feedback",
-            "end": END
+            "administration": "administration",
+            "assessment": "assessment",
         }
     )
-    
-    # Process feedback completes the workflow
-    builder.add_edge("process_feedback", END)
     
     # Compile the graph
     graph = builder.compile()
