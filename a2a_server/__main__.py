@@ -10,10 +10,10 @@ from a2a.types import (
     AgentCapabilities,
     AgentCard,
 )
-from scripts.a2a_admin_server_mock.admin_agent_executor import (
+from a2a_server.admin_agent_executor import (
     AdministrationAgentExecutor,  # type: ignore[import-untyped]
 )
-from scripts.a2a_admin_server_mock.admin_agent_skills import (
+from a2a_server.admin_agent_skills import (
     get_public_skills,
     get_extended_skills,
 )

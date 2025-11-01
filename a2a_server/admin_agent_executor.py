@@ -5,10 +5,10 @@ from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.utils import new_agent_text_message
 
-from scripts.a2a_admin_server_mock.admin_agent import (
+from a2a_server.admin_agent import (
     AdministrationAgent,
 )
-from scripts.a2a_admin_server_mock.context_utils import (
+from a2a_server.context_utils import (
     extract_user_query_from_context,
 )
 
