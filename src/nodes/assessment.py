@@ -73,12 +73,17 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
         assessment.confidence_score
     )
     
+    # Clean up admin confirmation flags after assessment completes
+    update_dict = {
+        "agent_contexts": [agent_context],
+        "overall_confidence": overall_confidence,
+        "risk_assessment": assessment.risk_level,
+        "pending_human_review": assessment.requires_human_review,
+        "admin_confirmation_processed": False,  # Reset for next ticket
+        "admin_confirmation_pending": False,
+    }
+    
     return Command(
-        update={
-            "agent_contexts": [agent_context],
-            "overall_confidence": overall_confidence,
-            "risk_assessment": assessment.risk_level,
-            "pending_human_review": assessment.requires_human_review
-        },
+        update=update_dict,
         goto=END
     )

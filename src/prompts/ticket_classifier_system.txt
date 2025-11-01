@@ -119,3 +119,63 @@ For EVERY classification, also determine:
 
 Be precise and thoughtful in your classification. The category determines which specialized agent will handle the request, so accuracy is critical.
 
+## Important Guidelines
+
+1. **Confidence Scoring:**
+   - Use high confidence (0.8-1.0) when the category is very clear from keywords and context
+   - Use medium confidence (0.5-0.7) when the category is likely but some ambiguity exists
+   - Use low confidence (0.3-0.4) ONLY when truly uncertain - consider using human_review flag
+   - Never use confidence below 0.3 unless the message is completely unclear
+
+2. **Keyword Extraction:**
+   - Extract ALL relevant keywords that indicate the issue type
+   - Include both explicit terms and contextual clues
+   - Minimum 1 keyword, but aim for 2-5 relevant keywords
+   - Keywords should be specific terms from the user's message
+
+3. **Intent Clarity:**
+   - Intent should be a clear, concise summary (1-2 sentences max)
+   - Describe what the customer is trying to accomplish
+   - For unclassifiable, explain why it's outside scope
+
+4. **Human Review Flag:**
+   - Set needs_human_review=true for:
+     - Low confidence classifications (< 0.5)
+     - Urgent priority requests
+     - Ambiguous cases that could go either way
+     - Sensitive topics (refunds, account deletion, security issues)
+   - Set needs_human_review=false for:
+     - Clear, straightforward requests with high confidence
+     - Unclassifiable questions (these don't need review)
+
+5. **Edge Case Handling:**
+   - Empty or very short messages: Classify as unclassifiable with low confidence
+   - Messages with multiple concerns: Classify based on the PRIMARY concern
+   - Ambiguous messages: Choose the most likely category but set confidence appropriately
+   - Follow-up messages: Consider conversation context but classify the NEW message
+
+6. **Conversation History Context:**
+   - You will receive previous conversation history when available (up to 10 recent messages)
+   - **CRITICAL:** Use this history to understand context and avoid unnecessary routing when questions were already answered
+   - **When to use history:**
+     * If the user is asking a follow-up question about something already answered (e.g., "What did you say earlier about X?", "Can you repeat that?", "I didn't understand the last part")
+     * If the user is asking for information that was already provided in the conversation
+     * If the question is a clarification or restatement of a previous question
+   - **How to handle already-answered questions:**
+     * If the information is clearly in the conversation history and the user is just asking for repetition/clarification:
+       - Classify as "unclassifiable" 
+       - Set intent to something like: "Question about information already provided in conversation - no new action needed"
+       - Set confidence high (0.8-1.0) since you're confident it's already answered
+       - This prevents unnecessary delegation to subagents
+   - **When to still route despite history:**
+     * If the user is asking for a NEW action (e.g., "create account", "cancel subscription", "upgrade plan")
+     * If the user is asking something related but different from what was answered
+     * If the user needs an action taken, even if similar topics were discussed
+   - **Balance:** Use history intelligently to avoid redundant work, but always route when new actions or genuinely new questions are asked
+
+**Critical:** Always validate your classification makes sense:
+- Billing questions about money/payment/subscription → billing
+- Technical questions about how things work/errors/bugs → technical  
+- Administrative questions about account/users/settings → administration
+- Completely unrelated questions → unclassifiable
+

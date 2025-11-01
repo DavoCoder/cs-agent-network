@@ -134,6 +134,24 @@ class Configuration(BaseModel):
         json_schema_extra={"langgraph_nodes": ["administration"]}
     )
 
+    # Human supervisor configuration
+    admin_confirmation_message: str = Field(
+        default=pull_externalized_prompt("admin_confirmation_message", 0),
+        description="Template message for admin action confirmation requests",
+        json_schema_extra={
+            "langgraph_nodes": ["human_review"],
+            "langgraph_type": "prompt"
+        }
+    )
+    admin_confirmation_question: str = Field(
+        default="Do you want to proceed with this administrative action?",
+        description="Question prompt for admin action confirmation",
+        json_schema_extra={
+            "langgraph_nodes": ["human_review"],
+            "langgraph_type": "prompt"
+        }
+    )
+
     # Assessment configuration
     assessment_system_prompt: str = Field(
         default=pull_externalized_prompt("assessment_system", 0),

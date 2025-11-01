@@ -1,0 +1,216 @@
+# Supervisor (Ticket Classifier) Test Cases
+# This file contains test prompts to validate the supervisor's classification and routing
+
+# ============================================================================
+# 1. POSITIVE CASES - Clear Classification (High Confidence Expected)
+# ============================================================================
+
+## Clear Billing Cases
+SUPERVISOR-POS-001: I was charged twice this month
+SUPERVISOR-POS-002: How much does the Pro plan cost?
+SUPERVISOR-POS-003: I want to cancel my subscription
+SUPERVISOR-POS-004: Can I get a refund?
+SUPERVISOR-POS-005: My payment failed
+SUPERVISOR-POS-006: What's the difference between Pro and Business plans?
+
+## Clear Technical Cases
+SUPERVISOR-POS-007: I can't log in to my account
+SUPERVISOR-POS-008: The API is returning 500 errors
+SUPERVISOR-POS-009: How do I configure webhooks?
+SUPERVISOR-POS-010: Feature X isn't working as expected
+SUPERVISOR-POS-011: I'm getting authentication errors
+
+## Clear Administration Cases
+SUPERVISOR-POS-012: I need to delete my account
+SUPERVISOR-POS-013: How do I add team members?
+SUPERVISOR-POS-014: I want to change my email address
+SUPERVISOR-POS-015: What permissions does the Developer role have?
+
+## Clear Unclassifiable Cases
+SUPERVISOR-POS-016: What's the weather like today?
+SUPERVISOR-POS-017: Tell me a joke
+SUPERVISOR-POS-018: How do I use AWS?
+SUPERVISOR-POS-019: What's the capital of France?
+
+
+# ============================================================================
+# 2. AMBIGUOUS CASES - Medium Confidence Expected
+# ============================================================================
+
+## Billing vs Technical Ambiguity
+AMBIG-SUP-001: My subscription isn't working (could be billing issue or technical problem)
+AMBIG-SUP-002: I can't access premium features (could be technical vs billing/permissions)
+AMBIG-SUP-003: The upgrade process failed (technical error vs billing issue)
+
+## Billing vs Administration Ambiguity
+AMBIG-SUP-004: I need to change my account (could be billing vs admin)
+AMBIG-SUP-005: How do I modify my subscription? (could be admin settings vs billing)
+AMBIG-SUP-006: I want to update my plan information
+
+## Technical vs Administration Ambiguity
+AMBIG-SUP-007: I can't access my account (technical vs admin/permissions)
+AMBIG-SUP-008: How do I change my account settings? (technical vs admin)
+AMBIG-SUP-009: My permissions aren't working (technical issue vs admin settings)
+
+## Vague Cases
+AMBIG-SUP-010: Something is wrong
+AMBIG-SUP-011: I have a problem
+AMBIG-SUP-012: Help me fix this
+AMBIG-SUP-013: It's broken
+
+
+# ============================================================================
+# 3. EDGE CASES - Low Confidence or Special Handling
+# ============================================================================
+
+## Empty or Minimal Messages
+EDGE-SUP-001: 
+EDGE-SUP-002: Hi
+EDGE-SUP-003: Help
+EDGE-SUP-004: ?
+EDGE-SUP-005: Thanks
+
+## Multiple Concerns
+EDGE-SUP-006: I can't log in and I was charged twice (primary concern?)
+EDGE-SUP-007: My subscription isn't working and I need to update my email
+EDGE-SUP-008: The API is broken and I want a refund
+
+## Context-Dependent Messages
+EDGE-SUP-009: Yes
+EDGE-SUP-010: No
+EDGE-SUP-011: That didn't work
+EDGE-SUP-012: Try again
+
+## Very Short Technical Indicators
+EDGE-SUP-013: Error
+EDGE-SUP-014: Bug
+EDGE-SUP-015: Broken
+
+## Very Short Billing Indicators
+EDGE-SUP-016: Refund
+EDGE-SUP-017: Charge
+EDGE-SUP-018: Payment
+
+## Very Short Admin Indicators
+EDGE-SUP-019: Account
+EDGE-SUP-020: Settings
+EDGE-SUP-021: Team
+
+
+# ============================================================================
+# 4. VALIDATION TEST CASES (Check Classification Fields)
+# ============================================================================
+
+## Confidence Validation
+VALID-001: I was charged twice this month
+# Expected: category=billing, confidence>=0.8, keywords=["charged", "twice", "payment"]
+
+## Intent Validation
+VALID-002: I need help with my subscription
+# Expected: intent should clearly describe customer goal, not empty
+
+## Keywords Validation
+VALID-003: The API authentication is failing with 401 errors
+# Expected: keywords should include ["API", "authentication", "401", "errors"], minimum 1 keyword
+
+## Priority Validation
+VALID-004: Urgent: I was charged incorrectly and need immediate refund
+# Expected: priority=urgent or high
+
+## Human Review Flag
+VALID-005: I need a refund for fraudulent charges
+# Expected: needs_human_review=true (sensitive topic)
+
+VALID-006: What plans do you offer?
+# Expected: needs_human_review=false (straightforward question)
+
+
+# ============================================================================
+# 5. BOUNDARY TEST CASES
+# ============================================================================
+
+## Low Confidence Thresholds
+BOUNDARY-001: Maybe billing maybe technical unclear
+# Expected: confidence < 0.5, needs_human_review=true
+
+## Category Boundaries
+BOUNDARY-002: How much does it cost to add team members? (billing vs admin)
+BOUNDARY-003: Why can't I access the premium features? (technical vs billing)
+BOUNDARY-004: My account payment failed (billing vs admin vs technical)
+
+## Priority Boundaries
+BOUNDARY-005: I have a question (should be low priority)
+BOUNDARY-006: URGENT: System is down (should be urgent priority)
+BOUNDARY-007: Critical bug affecting all users (should be high/urgent priority)
+
+
+# ============================================================================
+# 6. NEGATIVE VALIDATION CASES (Should Not Happen, but Test Handling)
+# ============================================================================
+
+## Invalid Classification Scenarios (to test validation)
+# These test the _validate_classification function
+# Note: Schema should prevent most, but runtime validation catches edge cases
+
+NEG-VALID-001: Empty message (may produce empty intent - should be handled)
+NEG-VALID-002: Very long message with multiple topics (may cause confusion)
+NEG-VALID-003: Message with only special characters (may fail classification)
+
+
+# ============================================================================
+# 7. ROUTING VALIDATION CASES
+# ============================================================================
+
+## Verify Correct Routing
+ROUTE-001: I want to upgrade my subscription
+# Expected: Routes to billing agent
+
+ROUTE-002: How do I use the API?
+# Expected: Routes to technical agent
+
+ROUTE-003: I need to delete my account
+# Expected: Routes to administration agent
+
+ROUTE-004: What's the weather today?
+# Expected: Routes to END (unclassifiable)
+
+## Verify Fallback on Error
+ROUTE-005: [Test with invalid LLM response simulation]
+# Expected: Falls back to technical agent with error_message in state
+
+
+# ============================================================================
+# TEST EXECUTION NOTES
+# ============================================================================
+#
+# For each test case, verify:
+# 1. Correct classification category
+# 2. Confidence score in valid range [0.0, 1.0]
+# 3. Intent is not empty and meaningful
+# 4. Keywords list is populated (minimum 1 keyword)
+# 5. Priority is valid (low, medium, high, urgent)
+# 6. needs_human_review is set appropriately
+# 7. Correct routing to appropriate agent or END
+# 8. State is properly updated (current_ticket, routing_history, agent_contexts)
+#
+# Key validations:
+# - POS cases: High confidence (>= 0.8), correct category, clear intent
+# - AMBIG cases: Medium confidence (0.5-0.7), needs_human_review may be true
+# - EDGE cases: Low confidence possible, special handling may be needed
+# - VALID cases: All fields populated correctly, valid ranges
+# - BOUNDARY cases: Test edge values and boundaries
+# - ROUTE cases: Verify routing targets are correct
+#
+# Monitoring:
+# - Log low confidence classifications (< 0.5) for review
+# - Log classification errors for debugging
+# - Track routing accuracy over time
+# - Monitor fallback usage
+#
+# Error Handling:
+# - Invalid classifications should fallback to technical
+# - LLM errors should be logged with exc_info
+# - Validation failures should set error_message in state
+# - Confidence values should be clamped to [0.0, 1.0]
+#
+

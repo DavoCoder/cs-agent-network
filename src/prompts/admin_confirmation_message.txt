@@ -1,0 +1,11 @@
+⚠️ **ADMINISTRATIVE ACTION REQUIRES CONFIRMATION**
+
+**Original Request**: {admin_original_query}
+
+**A2A Agent Response**:
+{admin_tool_response}
+
+**Action Required**: Please review the response above and confirm if you want to proceed with this action.
+
+**To confirm**: Reply with "Yes, proceed" or "Confirm" followed by any additional information needed.
+**To cancel**: Reply with "No" or "Cancel".

@@ -1,0 +1,180 @@
+# Technical Support Agent Test Cases
+# This file contains test prompts to validate the technical agent workflow
+
+# ============================================================================
+# 1. POSITIVE CASES - Clear Technical Queries (Should use tool)
+# ============================================================================
+
+## API & Integration Questions
+TECH-POS-001: How do I use the API to authenticate?
+TECH-POS-002: What endpoints are available in the API?
+TECH-POS-003: How can I integrate the API with Python?
+TECH-POS-004: How do I set up webhooks?
+TECH-POS-005: Can you show me an example of API authentication?
+TECH-POS-006: What's the Python SDK for this service?
+TECH-POS-007: How do I make an API call?
+
+## Feature Functionality Questions
+TECH-POS-008: How does the search feature work?
+TECH-POS-009: How do I configure notifications?
+TECH-POS-010: How to use the filtering functionality?
+TECH-POS-011: Can you explain how the dashboard works?
+TECH-POS-012: How do I set up automated workflows?
+TECH-POS-013: What's the process for creating a new project?
+
+## Configuration & Setup
+TECH-POS-014: How do I configure the application?
+TECH-POS-015: What are the setup requirements?
+TECH-POS-016: How to set up the development environment?
+TECH-POS-017: Can you help me configure database connections?
+TECH-POS-018: How do I install the required dependencies?
+
+## Error & Bug Reports
+TECH-POS-019: I'm getting a 500 error from the API
+TECH-POS-020: The application crashes when I try to save
+TECH-POS-021: I'm seeing connection timeout errors
+TECH-POS-022: There's a bug in the search functionality
+TECH-POS-023: The feature is not working as expected
+TECH-POS-024: I keep getting authentication errors
+
+## Login & Authentication Issues
+TECH-POS-025: I can't log in to my account
+TECH-POS-026: I forgot my password, how do I reset it?
+TECH-POS-027: My login credentials aren't working
+TECH-POS-028: How do I reset my password?
+TECH-POS-029: Authentication is failing
+
+## Implementation Help
+TECH-POS-030: How do I implement this in JavaScript?
+TECH-POS-031: Can you show me code examples?
+TECH-POS-032: What's the best way to handle errors?
+TECH-POS-033: How do I debug API issues?
+
+
+# ============================================================================
+# 2. AMBIGUOUS CASES - Could be Technical or Other Category
+# ============================================================================
+
+## Ambiguous - Technical vs Billing
+AMBIG-001: My subscription isn't working
+AMBIG-002: I can't access my premium features
+AMBIG-003: The upgrade process failed
+AMBIG-004: How do I change my plan? (could be technical how-to or billing question)
+
+## Ambiguous - Technical vs Admin
+AMBIG-005: I can't access my account
+AMBIG-006: How do I change my account settings?
+AMBIG-007: I need help with my user profile
+AMBIG-008: My permissions aren't working
+
+## Ambiguous - Technical Implementation vs General Question
+AMBIG-009: How does this work?
+AMBIG-010: What's the best approach?
+AMBIG-011: Can you explain the process?
+AMBIG-012: I need help understanding this
+
+## Edge Cases - Unclear Technical vs Non-Technical
+AMBIG-013: It's broken
+AMBIG-014: Something is wrong
+AMBIG-015: This doesn't work
+AMBIG-016: Help me fix this
+
+
+# ============================================================================
+# 3. NEGATIVE CASES - Should NOT Route to Technical Agent
+# ============================================================================
+
+## Billing Questions (Should route to billing)
+NEG-001: How much does the Pro plan cost?
+NEG-002: I was charged twice this month
+NEG-003: I want to cancel my subscription
+NEG-004: Can I get a refund?
+NEG-005: What's the difference between plans?
+NEG-006: My payment failed
+NEG-007: I need an invoice
+
+## Administration Questions (Should route to admin)
+NEG-008: I want to delete my account
+NEG-009: How do I add team members?
+NEG-010: I need to update my email address
+NEG-011: What permissions does the Developer role have?
+
+## General/Unclassifiable
+NEG-012: What's the weather today?
+NEG-013: Tell me a joke
+NEG-014: How do I use AWS?
+NEG-015: What's the capital of France?
+
+
+# ============================================================================
+# 4. TOOL USAGE EDGE CASES
+# ============================================================================
+
+## Queries that might not need tools (general knowledge)
+TOOL-EDGE-001: What is a REST API?
+TOOL-EDGE-002: Explain authentication vs authorization
+TOOL-EDGE-003: What does HTTP 500 mean?
+
+## Queries that definitely need tools
+TOOL-EDGE-004: How do I use your API to authenticate?
+TOOL-EDGE-005: What's the specific syntax for your webhook configuration?
+TOOL-EDGE-006: Show me documentation for your SDK
+
+## Vague queries that should still use tools
+TOOL-EDGE-007: Help me with API integration
+TOOL-EDGE-008: I need documentation
+TOOL-EDGE-009: Show me examples
+
+
+# ============================================================================
+# 5. MULTI-STEP TECHNICAL SCENARIOS
+# ============================================================================
+
+## Scenario 1: API Integration Flow
+SCENARIO-001-STEP1: How do I get started with the API?
+# Expected: Tool called, returns API documentation
+SCENARIO-001-STEP2: How do I authenticate?
+# Expected: Tool called, returns authentication documentation
+SCENARIO-001-STEP3: Can you show me an example request?
+# Expected: Tool called, returns code examples
+
+## Scenario 2: Troubleshooting Flow
+SCENARIO-002-STEP1: I'm getting errors when using the API
+# Expected: Tool called, returns error documentation/troubleshooting
+SCENARIO-002-STEP2: Specifically, I'm seeing 401 errors
+# Expected: Tool called, returns authentication error documentation
+SCENARIO-002-STEP3: How do I fix authentication issues?
+# Expected: Tool called, returns authentication setup guide
+
+## Scenario 3: Feature Discovery Flow
+SCENARIO-003-STEP1: What features are available?
+# Expected: Tool called, returns feature documentation
+SCENARIO-003-STEP2: How do I use the webhook feature?
+# Expected: Tool called, returns webhook documentation
+SCENARIO-003-STEP3: Can you show me a webhook example?
+# Expected: Tool called, returns webhook code examples
+
+
+# ============================================================================
+# TEST EXECUTION NOTES
+# ============================================================================
+#
+# For each test case:
+# 1. Check if ticket is correctly classified as "technical" by supervisor
+# 2. Verify tool is called (MCP docs tool)
+# 3. Verify response contains relevant technical information
+# 4. Verify routing: technical → technical_tools → technical → assessment
+#
+# Key validations:
+# - TECH-POS cases: Should use tool, return technical documentation/examples
+# - AMBIG cases: May need supervisor to determine routing, but if technical, should use tool
+# - NEG cases: Should NOT route to technical agent (should route to appropriate agent)
+# - TOOL-EDGE cases: Should use tool when specific to platform, may not need tool for general knowledge
+# - SCENARIO cases: Verify multi-step technical support flow
+#
+# Tool behavior:
+# - MCP tools should be called for platform-specific questions
+# - Should return documentation, code examples, or troubleshooting info
+# - If tool returns no results, agent should acknowledge and provide best-effort guidance
+#
+

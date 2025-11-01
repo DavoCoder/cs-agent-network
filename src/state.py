@@ -56,4 +56,5 @@ class ConversationState(MessagesState):
     # Admin agent confirmation tracking
     admin_tool_response: NotRequired[Optional[str]]  # Stores A2A agent response for human review
     admin_confirmation_pending: NotRequired[bool]  # True when waiting for user confirmation
+    admin_confirmation_processed: NotRequired[bool]  # True after user has confirmed and second tool call is executing
     admin_original_query: NotRequired[Optional[str]]  # Original user query that triggered admin tool

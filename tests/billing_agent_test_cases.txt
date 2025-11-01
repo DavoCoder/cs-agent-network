@@ -1,0 +1,216 @@
+# Billing Agent Test Cases
+# This file contains test prompts to validate the billing agent workflow
+
+# ============================================================================
+# 1. POSITIVE CASES - Clear Billing Queries (Should use tool)
+# ============================================================================
+
+## Payment & Charges
+BILL-POS-001: I was charged twice this month
+BILL-POS-002: My payment failed, what should I do?
+BILL-POS-003: Why was I charged $99?
+BILL-POS-004: I see an unexpected charge on my credit card
+BILL-POS-005: My credit card was declined
+BILL-POS-006: How do I update my payment method?
+BILL-POS-007: I need to change my credit card
+
+## Subscription Management
+BILL-POS-008: How do I cancel my subscription?
+BILL-POS-009: I want to upgrade to the Pro plan
+BILL-POS-010: Can I downgrade my subscription?
+BILL-POS-011: How do I change my subscription plan?
+BILL-POS-012: I want to switch from monthly to annual billing
+BILL-POS-013: My subscription auto-renewed but I didn't want it to
+BILL-POS-014: When will my subscription renew?
+
+## Pricing & Plans
+BILL-POS-015: What plans do you offer?
+BILL-POS-016: How much does the Pro plan cost?
+BILL-POS-017: What's the difference between Pro and Business plans?
+BILL-POS-018: What's included in the $99/month plan?
+BILL-POS-019: Are there any discounts available?
+BILL-POS-020: What's the pricing for enterprise?
+BILL-POS-021: How much does it cost to upgrade?
+
+## Refunds & Disputes
+BILL-POS-022: I want a refund for last month
+BILL-POS-023: Can I get a refund?
+BILL-POS-024: I was charged incorrectly
+BILL-POS-025: I need to dispute a charge
+BILL-POS-026: I cancelled but was still charged
+
+## Invoices & Billing History
+BILL-POS-027: How do I download my invoice?
+BILL-POS-028: I need a copy of my receipt
+BILL-POS-029: Where can I see my billing history?
+BILL-POS-030: How do I access past invoices?
+BILL-POS-031: I need an invoice for tax purposes
+
+## Billing Cycles & Dates
+BILL-POS-032: When is my next billing date?
+BILL-POS-033: Can I change my billing date?
+BILL-POS-034: How does the billing cycle work?
+BILL-POS-035: When will I be charged next?
+
+## Credits & Usage
+BILL-POS-036: I was charged for overage, is this correct?
+BILL-POS-037: How are usage-based charges calculated?
+BILL-POS-038: What happens if I exceed my plan limits?
+BILL-POS-039: How do credits work?
+
+## International & Tax
+BILL-POS-040: Do you charge VAT?
+BILL-POS-041: What currency will I be charged in?
+BILL-POS-042: How do international payments work?
+
+
+# ============================================================================
+# 2. AMBIGUOUS CASES - Could be Billing or Other Category
+# ============================================================================
+
+## Ambiguous - Billing vs Technical
+AMBIG-001: My subscription isn't working (technical issue vs billing question)
+AMBIG-002: I can't access premium features (technical vs billing/permissions)
+AMBIG-003: The upgrade process failed (technical error vs billing issue)
+AMBIG-004: I'm having trouble with my plan (technical vs billing)
+
+## Ambiguous - Billing vs Admin
+AMBIG-005: I need to change my account
+AMBIG-006: How do I modify my subscription? (could be admin settings vs billing)
+AMBIG-007: I want to update my plan information
+
+## Ambiguous - Pricing Questions
+AMBIG-008: Is it expensive?
+AMBIG-009: What does it cost? (general question)
+AMBIG-010: How much? (too vague)
+
+## Edge Cases - Unclear Intent
+AMBIG-011: Something is wrong with my billing
+AMBIG-012: I have a problem with charges
+AMBIG-013: My account shows incorrect information
+
+
+# ============================================================================
+# 3. NEGATIVE CASES - Should NOT Route to Billing Agent
+# ============================================================================
+
+## Technical Questions (Should route to technical)
+NEG-001: How do I use the API?
+NEG-002: The application is crashing
+NEG-003: I can't log in
+NEG-004: How do I configure webhooks?
+NEG-005: I'm getting error messages
+
+## Administration Questions (Should route to admin)
+NEG-006: I want to delete my account
+NEG-007: How do I add team members?
+NEG-008: I need to change my email address
+NEG-009: What are the user permissions?
+
+## General/Unclassifiable
+NEG-010: What's the weather today?
+NEG-011: Tell me a joke
+NEG-012: How do I use AWS?
+
+
+# ============================================================================
+# 4. TOOL USAGE EDGE CASES
+# ============================================================================
+
+## Queries that might not need tools (general billing knowledge)
+TOOL-EDGE-001: What is a subscription?
+TOOL-EDGE-002: Explain what an invoice is
+TOOL-EDGE-003: What does "auto-renewal" mean?
+
+## Queries that definitely need tools
+TOOL-EDGE-004: What's your refund policy?
+TOOL-EDGE-005: What are your subscription terms?
+TOOL-EDGE-006: Show me your pricing information
+
+## Sensitive Billing Queries
+TOOL-EDGE-007: I need to dispute a charge - how does that work?
+TOOL-EDGE-008: What's your policy on payment failures?
+TOOL-EDGE-009: Can you explain your billing cycles?
+
+
+# ============================================================================
+# 5. MULTI-STEP BILLING SCENARIOS
+# ============================================================================
+
+## Scenario 1: Subscription Change Flow
+SCENARIO-001-STEP1: I want to upgrade my subscription
+# Expected: Tool called, returns upgrade information
+SCENARIO-001-STEP2: What's the difference between Pro and Business?
+# Expected: Tool called, returns plan comparison
+SCENARIO-001-STEP3: How much does the Business plan cost?
+# Expected: Tool called, returns pricing information
+
+## Scenario 2: Payment Issue Resolution
+SCENARIO-002-STEP1: My payment failed
+# Expected: Tool called, returns payment troubleshooting info
+SCENARIO-002-STEP2: How do I update my payment method?
+# Expected: Tool called, returns payment method update instructions
+SCENARIO-002-STEP3: What happens if I don't update it?
+# Expected: Tool called, returns billing/payment policy info
+
+## Scenario 3: Refund Request Flow
+SCENARIO-003-STEP1: I want a refund
+# Expected: Tool called, returns refund policy
+SCENARIO-003-STEP2: What's your refund policy?
+# Expected: Tool called, returns detailed refund policy
+SCENARIO-003-STEP3: How long does a refund take?
+# Expected: Tool called, returns refund processing information
+
+
+# ============================================================================
+# 6. SENSITIVE BILLING CASES (Require Careful Handling)
+# ============================================================================
+
+## High-Urgency Billing Issues
+SENSITIVE-001: I was charged incorrectly and I need this resolved immediately
+SENSITIVE-002: My credit card was charged multiple times
+SENSITIVE-003: I cancelled but keep getting charged
+SENSITIVE-004: I want a full refund and to cancel immediately
+
+## Dispute Cases
+SENSITIVE-005: I need to dispute this charge
+SENSITIVE-006: This charge is fraudulent
+SENSITIVE-007: I didn't authorize this payment
+
+## Policy Questions
+SENSITIVE-008: What's your refund policy?
+SENSITIVE-009: Can I get a refund if I'm not satisfied?
+SENSITIVE-010: What happens if I cancel mid-cycle?
+
+
+# ============================================================================
+# TEST EXECUTION NOTES
+# ============================================================================
+#
+# For each test case:
+# 1. Check if ticket is correctly classified as "billing" by supervisor
+# 2. Verify tool is called (search_billing_kb)
+# 3. Verify response contains relevant billing information
+# 4. Verify routing: billing → billing_tools → billing → assessment
+#
+# Key validations:
+# - BILL-POS cases: Should use tool, return billing KB information
+# - AMBIG cases: May need supervisor to determine routing, but if billing, should use tool
+# - NEG cases: Should NOT route to billing agent (should route to appropriate agent)
+# - TOOL-EDGE cases: Should use tool for policy/pricing questions, may not need tool for general definitions
+# - SCENARIO cases: Verify multi-step billing support flow
+# - SENSITIVE cases: Verify proper handling of urgent/dispute cases, offer human escalation
+#
+# Tool behavior:
+# - search_billing_kb should be called for billing-related queries
+# - Should return relevant KB articles about billing policies, pricing, processes
+# - If tool returns no results, agent should acknowledge and offer to escalate
+#
+# Agent behavior guidelines:
+# - Be empathetic and understanding
+# - Use knowledge base information when available
+# - Be transparent about policies
+# - Offer human escalation for sensitive issues
+# - Never make promises about refunds without checking policies
+#
+

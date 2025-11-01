@@ -1,0 +1,238 @@
+# Administration Agent Test Cases
+# This file contains test prompts to validate the admin agent workflow
+
+# ============================================================================
+# 1. INFORMATIONAL QUERIES (Should use tool - returns info, no confirmation)
+# ============================================================================
+
+## Account Management - Questions
+INFO-001: How can I create a new account?
+INFO-002: How do I create an account?
+INFO-003: What do I need to create a new account?
+INFO-004: How to delete my account?
+INFO-005: What happens when I delete my account?
+
+## Profile Management - Questions  
+INFO-006: How can I change my email address?
+INFO-007: How do I update my name?
+INFO-008: What's the process to update my profile?
+
+## Permissions & Roles - Questions
+INFO-009: What permissions does the Developer role have?
+INFO-010: What roles are available?
+INFO-011: Can you explain the different permission levels?
+INFO-012: How do I check what permissions I have?
+
+## Team Management - Questions
+INFO-013: How do I add a team member?
+INFO-014: What information do I need to invite someone to the team?
+INFO-015: How can I remove a team member?
+
+## Organization - Questions
+INFO-016: How do I manage organization settings?
+INFO-017: What organization settings are available?
+INFO-018: How can I create a sub-account?
+
+
+# ============================================================================
+# 2. INITIAL ACTION REQUESTS (Should use tool - will request confirmation)
+# ============================================================================
+
+## Account Creation
+ACTION-001: I want to create a new account
+ACTION-002: Create an account for me
+ACTION-003: I need to set up a new account
+ACTION-004: Please create a new account
+
+## Account Deletion
+ACTION-005: I want to delete my account
+ACTION-006: Delete my account please
+ACTION-007: Remove my account
+ACTION-008: Close my account
+
+## Email Update
+ACTION-009: I want to change my email address
+ACTION-010: Update my email address
+ACTION-011: Change my email to new@example.com
+ACTION-012: I need to update my email
+
+## Name Update
+ACTION-013: I want to change my name
+ACTION-014: Update my name
+ACTION-015: Change my name to John Smith
+ACTION-016: I need to update my profile name
+
+## Team Member Addition
+ACTION-017: Add a team member
+ACTION-018: I want to invite someone to the team
+ACTION-019: Add member@example.com to my team
+ACTION-020: Invite a new team member
+
+## Team Member Removal
+ACTION-021: Remove a team member
+ACTION-022: I want to remove someone from the team
+ACTION-023: Delete team member member@example.com
+ACTION-024: Remove member from my team
+
+
+# ============================================================================
+# 3. CONFIRMATION MESSAGES (After tool call + human review - Should use tool with proper format)
+# ============================================================================
+
+## Account Creation Confirmations
+CONFIRM-001: Yes, proceed with account creation. Email: user@example.com, Name: John Doe
+CONFIRM-002: I confirm, please proceed. Email: user@example.com, Name: Jane Smith, Organization: Acme Corp
+CONFIRM-003: Yes, create the account. Email: admin@company.com, Name: Bob Johnson
+CONFIRM-004: Please proceed. Email: test@example.com, Name: Alice Williams, Organization: Tech Inc
+CONFIRM-005: Yes, create account. Email: user@test.com, Name: Charlie Brown
+
+## Account Deletion Confirmations
+CONFIRM-006: Yes, I confirm. My email is user@example.com
+CONFIRM-007: Proceed with deletion. Email: admin@company.com
+CONFIRM-008: I confirm, delete my account. Email: user@test.com
+CONFIRM-009: Yes, proceed with account deletion. Email: old@example.com
+
+## Email Update Confirmations
+CONFIRM-010: Yes, update my email. Current: old@example.com, New: new@example.com
+CONFIRM-011: I confirm, proceed. Current email: admin@old.com, New email: admin@new.com
+CONFIRM-012: Yes, change email. Current: user@test.com, New: user@production.com
+
+## Name Update Confirmations
+CONFIRM-013: Yes, update my name. Current: John Smith, New: John Doe
+CONFIRM-014: I confirm, proceed with name change. Current: Alice Brown, New: Alice Johnson
+CONFIRM-015: Yes, change name. Current: Bob Williams, New: Robert Williams
+
+## Team Member Addition Confirmations
+CONFIRM-016: Yes, send invitation. Email: member@example.com, Role: Developer
+CONFIRM-017: Proceed with invitation. Email: newmember@company.com, Role: Admin
+CONFIRM-018: I confirm. Email: team@example.com, Role: Viewer
+
+## Team Member Removal Confirmations
+CONFIRM-019: Yes, I confirm. Remove: member@example.com
+CONFIRM-020: Proceed with removal. Email: oldmember@company.com
+CONFIRM-021: Yes, remove member. Email: user@test.com
+
+
+# ============================================================================
+# 4. CANCELLATION CASES (After tool call + human review - Should NOT use tool)
+# ============================================================================
+
+## Direct Cancellations
+CANCEL-001: No
+CANCEL-002: Cancel
+CANCEL-003: Abort
+CANCEL-004: Stop
+CANCEL-005: No, don't proceed
+CANCEL-006: Cancel the request
+CANCEL-007: No thanks
+CANCEL-008: I changed my mind, cancel it
+CANCEL-009: Don't do it
+CANCEL-010: Cancel that action
+
+## Polite Cancellations
+CANCEL-011: No, I don't want to proceed
+CANCEL-012: Please cancel this request
+CANCEL-013: I've changed my mind, please cancel
+CANCEL-014: No, abort the process
+CANCEL-015: Stop, I don't want to do this
+
+## Explicit Cancellation with Context
+CANCEL-016: No, cancel the account creation
+CANCEL-017: Cancel the account deletion request
+CANCEL-018: Stop, don't update my email
+CANCEL-019: Abort the name change
+CANCEL-020: No, cancel adding the team member
+
+
+# ============================================================================
+# 5. EDGE CASES - Informational with ambiguous phrasing
+# ============================================================================
+
+EDGE-001: Can I create a new account?
+EDGE-002: Should I delete my account?
+EDGE-003: Is it possible to update my email?
+EDGE-004: What if I want to change my name?
+EDGE-005: Can you help me add a team member?
+
+
+# ============================================================================
+# 6. MALFORMED CONFIRMATIONS (Should still work with flexible matching)
+# ============================================================================
+
+MALFORM-001: Yes create account Email user@example.com Name John Doe
+MALFORM-002: confirm proceed email:admin@test.com name:Jane Smith
+MALFORM-003: yes, create the account, email is user@example.com
+MALFORM-004: proceed with account creation - email: test@example.com and name: Bob
+MALFORM-005: I confirm email user@example.com name John organization Acme
+
+
+# ============================================================================
+# 7. MULTI-STEP SCENARIOS (To test full workflow)
+# ============================================================================
+
+## Scenario 1: Account Creation Flow
+SCENARIO-001-STEP1: I want to create a new account
+# Expected: Tool called, returns info about required fields
+# User sees confirmation prompt
+SCENARIO-001-STEP2: Yes, create the account. Email: newuser@example.com, Name: New User, Organization: Test Corp
+# Expected: Tool called again with confirmation, account created
+
+## Scenario 2: Account Creation with Cancellation
+SCENARIO-002-STEP1: How can I create a new account?
+# Expected: Tool called, returns informational message
+SCENARIO-002-STEP2: Create an account for me
+# Expected: Tool called, returns info about required fields, confirmation prompt
+SCENARIO-002-STEP3: Cancel
+# Expected: No tool call, cancellation message, routes to assessment
+
+## Scenario 3: Email Update Flow
+SCENARIO-003-STEP1: I want to update my email address
+# Expected: Tool called, returns info about required fields
+SCENARIO-003-STEP2: Yes, update my email. Current: old@example.com, New: new@example.com
+# Expected: Tool called again with confirmation, email updated
+
+## Scenario 4: Email Update with Cancellation
+SCENARIO-004-STEP1: Update my email address
+# Expected: Tool called, returns info, confirmation prompt
+SCENARIO-004-STEP2: No, I changed my mind
+# Expected: No tool call, cancellation message, routes to assessment
+
+## Scenario 5: Team Member Addition Flow
+SCENARIO-005-STEP1: Add a team member
+# Expected: Tool called, returns info about required fields
+SCENARIO-005-STEP2: Yes, send invitation. Email: member@example.com, Role: Developer
+# Expected: Tool called again with confirmation, invitation sent
+
+
+# ============================================================================
+# 8. NEGATIVE TEST CASES (Should NOT trigger admin agent)
+# ============================================================================
+
+NEGATIVE-001: I have a billing question
+NEGATIVE-002: My software is not working
+NEGATIVE-003: How do I reset my password?
+NEGATIVE-004: I need technical support
+NEGATIVE-005: Can you help with API integration?
+
+
+# ============================================================================
+# TEST EXECUTION NOTES
+# ============================================================================
+#
+# For each test case:
+# 1. Check if tool is called (should be called for INFO, ACTION, CONFIRM, MALFORM cases)
+# 2. Check if tool is NOT called (should NOT be called for CANCEL cases after confirmation prompt)
+# 3. Verify response matches expected format
+# 4. For SCENARIO cases, verify complete workflow
+#
+# Key validations:
+# - INFO cases: Tool returns informational message, no confirmation prompt
+# - ACTION cases: Tool returns info/confirmation request, triggers human review
+# - CONFIRM cases: Tool detects confirmation, executes action
+# - CANCEL cases: No tool call, cancellation message, clean state reset
+# - EDGE cases: Should be handled as informational queries
+# - MALFORM cases: Should still work due to flexible matching
+# - SCENARIO cases: Verify end-to-end flow including state management
+# - NEGATIVE cases: Should route to appropriate agent (billing/technical), not admin
+#
+

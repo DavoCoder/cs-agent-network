@@ -25,8 +25,7 @@ from src.nodes.administration import (
 from src.tools.administration_tools import call_external_admin_a2a_agent
 from src.nodes.human_supervisor import ( 
     human_review_interrupt, 
-    process_human_feedback, 
-    route_after_feedback
+    process_human_feedback,
 )
 
 async def create_agent_network(config: RunnableConfig):
@@ -90,12 +89,14 @@ async def create_agent_network(config: RunnableConfig):
         }
     )
 
-    # Administration agent routing
+    # Administration agent routing - CENTRAL ROUTING HUB
+    # Administration node handles all routing decisions: admin_tools, human_review, or assessment
     builder.add_conditional_edges(
         "administration",
         admin_should_continue,
         {
             "admin_tools": "admin_tools",
+            "human_review": "human_review",
             "assessment": "assessment",
         }
     )
@@ -103,19 +104,15 @@ async def create_agent_network(config: RunnableConfig):
     # Tools complete, loop back to agent
     builder.add_edge("billing_tools", "billing")
     builder.add_edge("technical_tools", "technical")
-    # Admin tools always goes to human_review for confirmation after tool execution
-    builder.add_edge("admin_tools", "human_review")
     
+    # Admin tools ALWAYS routes back to administration (administration decides next step)
+    builder.add_edge("admin_tools", "administration")
+    
+    # Human review flow
     builder.add_edge("human_review", "process_feedback")
     
-    builder.add_conditional_edges(
-        "process_feedback",
-        route_after_feedback,
-        {
-            "administration": "administration",
-            "assessment": "assessment",
-        }
-    )
+    # Process feedback ALWAYS routes back to administration (administration decides next step)
+    builder.add_edge("process_feedback", "administration")
     
     # Compile the graph
     graph = builder.compile()

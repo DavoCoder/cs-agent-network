@@ -71,17 +71,37 @@ def _extract_text_from_a2a_response(response_dict: dict[str, Any]) -> str:
 @tool
 async def call_external_admin_a2a_agent(query: str) -> str:
     """
-    Call the external A2A administration agent to handle administrative tasks.
+    **USE THIS TOOL FOR ALL ADMINISTRATIVE QUERIES AND REQUESTS.**
     
-    This tool connects to an A2A-compliant administration agent server and sends
-    queries for processing. It handles account management, profile updates,
-    permissions, team management, and organization settings.
+    Call the external A2A administration agent to handle administrative tasks.
+    This tool MUST be used whenever the user asks about or requests any administrative action.
+    
+    **Capabilities:**
+    - Account Management: Create accounts, delete accounts, close accounts
+    - Profile Management: Update email addresses, change names, modify profile information
+    - Permissions & Roles: Query role information, manage permissions, view access controls
+    - Team Management: Add team members, remove team members, invite users, manage team settings
+    - Organization Settings: Manage organization configurations, sub-accounts, enterprise settings
+    
+    **When to use this tool:**
+    - User asks "How to..." questions about administrative tasks (e.g., "How can I create a new account?")
+    - User requests administrative actions (e.g., "I want to delete my account", "Update my email")
+    - User asks about permissions, roles, or access control
+    - User wants to manage team members or organization settings
+    - User provides confirmation or additional information for administrative actions
+    - ANY administrative query, regardless of whether it's informational or an action request
+    
+    **Important:** Always use this tool for administrative tasks. The external agent will:
+    1. Provide information for informational queries (e.g., "How to create account?")
+    2. Request confirmation for action requests (e.g., "Create account" -> asks for details)
+    3. Execute actions after confirmation (e.g., "Yes, proceed. Email: user@example.com")
     
     Args:
-        query: The user's administrative request or query
+        query: The user's administrative request, question, or confirmation message
         
     Returns:
-        The agent's response as a string or JSON dict
+        The administration agent's response as a text string containing information,
+        instructions, or confirmation of executed actions
     """
     port = int(os.getenv('A2A_SERVER_PORT', '9999'))
     host = os.getenv('A2A_SERVER_HOST', '127.0.0.1')

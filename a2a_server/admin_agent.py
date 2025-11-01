@@ -6,19 +6,39 @@ class AdministrationAgent:
     """Administration Agent that handles administrative tasks and queries with confirmation steps."""
 
     def _is_confirmation_message(self, query_lower: str) -> bool:
-        """Check if the message contains confirmation keywords and relevant data."""
+        """
+        Check if the message contains confirmation keywords and relevant data.
+        
+        Returns True only if BOTH conditions are met:
+        1. Contains explicit confirmation keywords
+        2. Contains data indicators OR has been formatted as a confirmation response
+        
+        This prevents informational questions (like "How to create an account?") 
+        from being treated as confirmations.
+        """
         confirmation_keywords = [
             'yes', 'confirm', 'proceed', 'execute', 'go ahead', 'ok', 'okay',
             'approved', 'authorize', 'i confirm', 'please proceed', 'do it'
         ]
         has_confirmation = any(keyword in query_lower for keyword in confirmation_keywords)
         
+        # Check for informational question words that indicate this is NOT a confirmation
+        question_indicators = ['how', 'what', 'when', 'where', 'why', 'can i', 'should i']
+        is_question = any(indicator in query_lower for indicator in question_indicators)
+        
+        # If it's a question, it's not a confirmation
+        if is_question:
+            return False
+        
         # Check for data indicators (email, names, roles, etc.)
+        # Only consider data as confirmation if we also have confirmation keywords
         has_data = any(indicator in query_lower for indicator in [
-            '@', 'email', 'name', 'role', 'permission', 'member', 'team'
+            '@', 'email:', 'name:', 'role:', 'current:', 'new:'
         ])
         
-        return has_confirmation or has_data
+        # Require both confirmation keyword AND (data OR the query is clearly formatted as confirmation)
+        # This prevents queries like "create account" from being treated as confirmations
+        return has_confirmation and (has_data or len(query_lower.split()) > 10)
 
     async def process_admin_request(self, user_query: str) -> str:
         """
@@ -64,7 +84,8 @@ class AdministrationAgent:
                 "Example: 'Yes, I confirm. My email is user@example.com'"
             )
         
-        if 'create account' in query_lower or 'new account' in query_lower:
+        # Check for account creation - flexible matching to catch "create account", "create the account", "create a new account", etc.
+        if ('create' in query_lower and 'account' in query_lower) or 'new account' in query_lower:
             if is_confirmation:
                 # Extract name if provided
                 name_match = re.search(r'(?:name|full name)[: ]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)', user_query, re.IGNORECASE)
