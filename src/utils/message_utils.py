@@ -1,5 +1,10 @@
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
+def create_ai_message(content: str, messages: list):
+    """Helper to create message in correct format based on message history"""
+    if isinstance(messages, list) and messages and isinstance(messages[0], dict):
+        return {"type": "ai", "content": content}
+    return AIMessage(content=content)
 
 def extract_user_message(messages):
     """

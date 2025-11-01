@@ -1,46 +1,16 @@
 """
 Supervisor node that classifies the customer's message and determines routing.
 """
-from typing import List, Literal
-from pydantic import BaseModel, Field
+from typing import Literal
 from langgraph.graph import END
 from langgraph.types import Command
 from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from src.utils.models import load_chat_model
 from src.state import ConversationState
-from src.prompts import load_prompt
-from src.utils.message_utils import extract_user_message
+from src.utils.message_utils import extract_user_message, create_ai_message
 from src.configuration import Configuration
-
-class TicketClassification(BaseModel):
-    """Structured output for ticket classification"""
-    category: Literal["technical", "billing", "administration", "unclassifiable"] = Field(
-        description="The category of the support request"
-    )
-    priority: Literal["low", "medium", "high", "urgent"] = Field(
-        description="The urgency/priority level of the request"
-    )
-    intent: str = Field(
-        description="A brief summary of the customer's intent or what they're trying to accomplish"
-    )
-    keywords: List[str] = Field(
-        description="Key terms or phrases from the message that indicate the issue"
-    )
-    confidence: float = Field(
-        description="Confidence score from 0.0 to 1.0 for the classification"
-    )
-    needs_human_review: bool = Field(
-        description="Whether this request might need human review"
-    )
-
-
-def _create_ai_message(content: str, messages: list):
-    """Helper to create message in correct format based on message history"""
-    if isinstance(messages, list) and messages and isinstance(messages[0], dict):
-        return {"type": "ai", "content": content}
-    return AIMessage(content=content)
-
+from src.schemas.classification import TicketClassification
 
 def _create_agent_context(classification: TicketClassification) -> dict:
     """Helper to create agent context from classification"""
@@ -80,12 +50,10 @@ def classify_ticket_with_llm(state: ConversationState,
     
     structured_llm = model.with_structured_output(TicketClassification)
     
-    system_prompt = config.supervisor_system_prompt
-    
     # Get recent conversation history (last 5 messages for classification context)
     recent_history = messages[-5:] if len(messages) > 5 else messages
     
-    classification_messages = [SystemMessage(content=system_prompt)]
+    classification_messages = [SystemMessage(content=config.supervisor_system_prompt)]
     
     # Add conversation context (skip the current user message as it will be added separately)
     for msg in recent_history:
@@ -111,8 +79,8 @@ def classify_ticket_with_llm(state: ConversationState,
     
     # Handle unclassifiable questions
     if classification.category == "unclassifiable":
-        response_message = load_prompt("unclassifiable_response")
-        new_message = _create_ai_message(response_message, messages)
+        response_message = config.unclassifiable_response_ai_prompt
+        new_message = create_ai_message(response_message, messages)
         
         agent_context = _create_agent_context(classification)
         agent_context["reasoning"] = classification.intent

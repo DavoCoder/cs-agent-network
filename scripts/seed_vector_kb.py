@@ -90,6 +90,6 @@ if __name__ == "__main__":
         print(f"Error seeding database: {e}")
         print("\nMake sure you have:")
         print("1. Set PINECONE_API_KEY in your environment")
-        print("2. Installed dependencies: pip install pinecone-client langchain-pinecone")
+        print("2. Installed dependencies: pip install pinecone langchain-community")
         print("3. Created a .env file with your API key")
 

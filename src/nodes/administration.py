@@ -8,7 +8,6 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 import httpx
 from src.state import ConversationState
-from src.prompts import aload_prompt
 from src.configuration import Configuration
 from src.utils.a2a_client import build_a2a_jsonrpc_request, parse_a2a_jsonrpc_response
 from src.utils.models import load_chat_model
@@ -68,19 +67,13 @@ async def process_administration_ticket(state: ConversationState, runtime: Runna
         print(f"Admin tool-call limit reached ({current_count}/{limit}); skipping tool binding.")
         return {"messages": []}
 
-    # Load system prompt
-    system_prompt = config.administration_system_prompt
-
-    # Create LLM with tools bound
-    model_name = config.administration_model
-    temperature = config.administration_temperature
-    llm = load_chat_model(model_name, temperature=temperature)
+    llm = load_chat_model(config.administration_model, temperature=config.administration_temperature)
     tools = [a2a_admin_action]
     print("************A2A Tools:", tools)
     # Force the model to call the A2A tool with arguments
     llm_with_tools = llm.bind_tools(tools, tool_choice="a2a_admin_action")
 
-    agent_messages = [SystemMessage(content=system_prompt)] + messages
+    agent_messages = [SystemMessage(content=config.administration_system_prompt)] + messages
     response = await llm_with_tools.ainvoke(agent_messages)
 
     # Increment tool-call count if a tool call was made
@@ -99,12 +92,10 @@ def should_continue(state: ConversationState, runtime: RunnableConfig[Configurat
     agent_key = "administration"
     tool_call_counts = state.get("tool_call_counts", {}) or {}
     tool_call_limits = state.get("tool_call_limits", {}) or {}
-    # Get default limit from config or env; falls back to 1 if not set
-    if runtime and runtime.context:
-        config = runtime.context
-        default_limit = config.administration_tool_call_limit or config.global_tool_call_limit or 1
-    else:
-        default_limit = int(os.getenv("ADMIN_TOOL_CALL_LIMIT", os.getenv("GLOBAL_TOOL_CALL_LIMIT", "1")))
+
+    config = runtime.context if runtime.context else Configuration()
+    default_limit = config.administration_tool_call_limit or config.global_tool_call_limit or 1
+
     current_count = int(tool_call_counts.get(agent_key, 0))
     limit = int(tool_call_limits.get(agent_key, default_limit))
     if current_count >= limit:

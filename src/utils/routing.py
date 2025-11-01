@@ -8,22 +8,7 @@ def determine_routing_decision(
     risk_level: str,
     agent_contexts: list
 ) -> str:
-    """
-    Determine where to route next based on review requirements and state.
-    
-    This implements the same logic as determine_needs_human_review but
-    returns the actual routing decision (node name or END).
-    
-    Args:
-        state: Current conversation state
-        needs_review: Whether this agent determined review is needed
-        overall_confidence: Confidence score for the response
-        risk_level: Risk level (low, medium, high)
-        agent_contexts: List of agent contexts from state
-    
-    Returns:
-        Either "human_review" or END constant
-    """
+    """Determine where to route next based on review requirements and state."""
     # Check if human feedback exists
     if state.get("human_feedback"):
         return END

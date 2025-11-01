@@ -4,33 +4,12 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 from langgraph.types import Command
-from pydantic import BaseModel, Field
 from src.state import ConversationState, AgentContext
 from src.utils.routing import determine_routing_decision
 from src.utils.message_utils import extract_user_message
 from src.configuration import Configuration
 from src.utils.models import load_chat_model
-from src.prompts import load_prompt
-
-class Assessment(BaseModel):
-    """Structured output for ticket assessment"""
-    confidence_score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Confidence in the quality of the response (0.0 to 1.0)"
-    )
-    risk_level: Literal["low", "medium", "high"] = Field(
-        description="Risk level of the operation"
-    )
-    compliance_risks: str = Field(
-        description="Description of any compliance, legal, or policy risks"
-    )
-    requires_human_review: bool = Field(
-        description="Whether this requires human oversight"
-    )
-    reasoning: str = Field(
-        description="Brief explanation of the assessment"
-    )
+from src.schemas.assessment import Assessment
 
 
 def process_assessment(state: ConversationState, runtime: RunnableConfig[Configuration]) -> Command[Literal["human_review", END]]:
@@ -60,21 +39,14 @@ def process_assessment(state: ConversationState, runtime: RunnableConfig[Configu
 
     # runtime.context is a Configuration instance, so access attributes directly
     config = runtime.context if runtime.context else Configuration()
-
-    # Load prompts
-    assessment_prompt = config.assessment_system_prompt
-    human_prompt = load_prompt("assessment_human")  # Keep using load_prompt for the human template
     
-    # Create LLM with structured output
-    model_name = config.assessment_model
-    temperature = config.assessment_temperature
-    llm = load_chat_model(model_name, temperature=temperature)
+    llm = load_chat_model(config.assessment_model, temperature=config.assessment_temperature)
     structured_llm = llm.with_structured_output(Assessment)
     
     # Build assessment prompt
     prompt = ChatPromptTemplate.from_messages([
-        ("system", assessment_prompt),
-        ("human", human_prompt)
+        ("system", config.assessment_system_prompt),
+        ("human", config.assessment_human_prompt)
     ])
     
     # Invoke LLM for assessment

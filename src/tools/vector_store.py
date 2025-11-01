@@ -3,13 +3,31 @@ from typing import List, Optional
 from langchain_core.documents import Document
 
 # Conditional imports - gracefully handle missing dependencies
+# Priority: langchain-pinecone (preferred) -> langchain-community (fallback)
 try:
     from pinecone import Pinecone, ServerlessSpec
+    from pinecone.db_data.index import Index as PineconeIndex
     from langchain_openai import OpenAIEmbeddings
-    from langchain_pinecone import PineconeVectorStore
+    
+    # Try langchain-pinecone first (preferred package, but requires langchain-core<1.0.0)
+    # When langchain-pinecone supports langchain-core 1.0.x, this will work automatically
+    USE_LANGCHAIN_PINECONE = False
+    try:
+        from langchain_pinecone import PineconeVectorStore
+        USE_LANGCHAIN_PINECONE = True
+    except (ImportError, ModuleNotFoundError):
+        # Fallback to langchain-community (compatible with langchain-core 1.0.x)
+        # Note: langchain-community's Pinecone class is deprecated but works with current setup
+        from langchain_community.vectorstores import Pinecone as PineconeVectorStore
+        # Monkey-patch pinecone module to have Index attribute for isinstance checks
+        # This is needed because Pinecone 7.x moved Index class location
+        import pinecone
+        if not hasattr(pinecone, 'Index'):
+            pinecone.Index = PineconeIndex
     PINECONE_AVAILABLE = True
 except ImportError:
     PINECONE_AVAILABLE = False
+    USE_LANGCHAIN_PINECONE = False
 
 class VectorStoreManager:
     """Manager for Pinecone vector store operations."""
@@ -21,7 +39,10 @@ class VectorStoreManager:
     ):
         """ Initialize the vector store manager. """
         if not PINECONE_AVAILABLE:
-            raise ImportError("Pinecone packages not installed. Install with: pip install pinecone-client langchain-pinecone")
+            raise ImportError(
+                "Pinecone packages not installed. Install with: "
+                "pip install pinecone langchain-pinecone (or langchain-community as fallback)"
+            )
         
         self.index_name = index_name
         self.dimension = dimension
@@ -40,14 +61,26 @@ class VectorStoreManager:
         self._setup_index()
         
         # Initialize vector store
-        self.vector_store = PineconeVectorStore(
-            index=self.index,
-            embedding=self.embeddings
-        )
+        if USE_LANGCHAIN_PINECONE:
+            # langchain-pinecone API (when compatible version is available)
+            # Note: Check langchain-pinecone docs for current API when version 0.3.0+ supports langchain-core 1.0.x
+            self.vector_store = PineconeVectorStore(
+                index=self.index,
+                embedding=self.embeddings
+            )
+        else:
+            # langchain-community API (fallback, deprecated but compatible with langchain-core 1.0.x)
+            # text_key specifies the key in Pinecone metadata where the text content is stored
+            self.vector_store = PineconeVectorStore(
+                index=self.index,
+                embedding=self.embeddings,
+                text_key="text"  # Required parameter in langchain-community
+            )
     
     def _setup_index(self):
         """Create index if it doesn't exist, or get existing one."""
-        if self.index_name not in [idx.name for idx in self.pinecone.list_indexes()]:
+        # In Pinecone 7.x, use has_index() method to check if index exists
+        if not self.pinecone.has_index(self.index_name):
             # Create index if it doesn't exist
             self.pinecone.create_index(
                 name=self.index_name,

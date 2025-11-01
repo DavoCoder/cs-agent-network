@@ -3,11 +3,11 @@ from typing import Literal
 from typing_extensions import Annotated
 
 from pydantic import BaseModel, Field
-
-
-from src.prompts import load_prompt
+from src.utils.prompt_loader import pull_externalized_prompt
 
 SYSTEM_PROMPT_DESCRIPTION = "The system prompt for the agent. Must be a string"
+HUMAN_PROMPT_DESCRIPTION = "The human prompt for the agent. Must be a string"
+AI_PROMPT_DESCRIPTION = "The AI prompt for the agent. Must be a string"
 
 MODEL_CHOICES = Literal["openai/gpt-4o-mini", "openai/o1", "openai/o1-mini"]
 MODEL_CHOICES_DESCRIPTION = (
@@ -33,7 +33,7 @@ class Configuration(BaseModel):
 
     # Supervisor configuration
     supervisor_system_prompt: str = Field(
-        default=load_prompt("ticket_classifier_system"),
+        default=pull_externalized_prompt("ticket_classifier_system", 0),
         description=SYSTEM_PROMPT_DESCRIPTION,
         json_schema_extra={
             "langgraph_nodes": ["supervisor"],
@@ -50,10 +50,18 @@ class Configuration(BaseModel):
         description=TEMPERATURE_DESCRIPTION,
         json_schema_extra={"langgraph_nodes": ["supervisor"]}
     )
+    unclassifiable_response_ai_prompt: str = Field(
+        default=pull_externalized_prompt("unclassifiable_response_ai", 0),
+        description=AI_PROMPT_DESCRIPTION,
+        json_schema_extra={
+            "langgraph_nodes": ["supervisor"],
+            "langgraph_type": "prompt"
+        }
+    )
 
     # Technical agent configuration
     technical_agent_system_prompt: str = Field(
-        default=load_prompt("technical_agent_system"),
+        default=pull_externalized_prompt("technical_agent_system", 0),
         description=SYSTEM_PROMPT_DESCRIPTION,
         json_schema_extra={
             "langgraph_nodes": ["technical"],
@@ -78,7 +86,7 @@ class Configuration(BaseModel):
 
     # Billing agent configuration
     billing_system_prompt: str = Field(
-        default=load_prompt("billing_agent_system"),
+        default=pull_externalized_prompt("billing_agent_system", 0),
         description=SYSTEM_PROMPT_DESCRIPTION,
         json_schema_extra={
             "langgraph_nodes": ["billing"],
@@ -103,7 +111,7 @@ class Configuration(BaseModel):
 
     # Administration agent configuration
     administration_system_prompt: str = Field(
-        default=load_prompt("administration_agent_system"),
+        default=pull_externalized_prompt("administration_agent_system", 0),
         description=SYSTEM_PROMPT_DESCRIPTION,
         json_schema_extra={
             "langgraph_nodes": ["administration"],
@@ -128,8 +136,16 @@ class Configuration(BaseModel):
 
     # Assessment configuration
     assessment_system_prompt: str = Field(
-        default=load_prompt("assessment_system"),
+        default=pull_externalized_prompt("assessment_system", 0),
         description=SYSTEM_PROMPT_DESCRIPTION,
+        json_schema_extra={
+            "langgraph_nodes": ["assessment"],
+            "langgraph_type": "prompt"
+        }
+    )
+    assessment_human_prompt: str = Field(
+        default=pull_externalized_prompt("assessment_human", 0),
+        description=HUMAN_PROMPT_DESCRIPTION,
         json_schema_extra={
             "langgraph_nodes": ["assessment"],
             "langgraph_type": "prompt"
