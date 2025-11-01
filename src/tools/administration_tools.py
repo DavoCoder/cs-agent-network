@@ -1,7 +1,7 @@
 """Administration-related tools for the agent network."""
 import os
 import logging
-from typing import Any
+from typing import Any, Optional
 from uuid import uuid4
 import httpx
 
@@ -19,6 +19,39 @@ from a2a.utils.constants import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Global variable to store config for tool access
+# This is set by the graph before tool invocation
+_current_runtime_config: Optional[dict] = None
+
+
+def set_runtime_config(config: dict | None):
+    """ Set the runtime config for tool access. """
+    global _current_runtime_config
+    _current_runtime_config = config
+
+
+def get_a2a_admin_agent_key_from_config() -> str | None:
+    """ Get the A2A admin agent key from the runtime config. """
+    
+    if not _current_runtime_config:
+        logger.warning('No runtime config available, falling back to env variable')
+        return os.getenv("A2A_ADMIN_AGENT_KEY")
+    
+    # Access langgraph_auth_user from config
+    configurable = _current_runtime_config.get("configurable", {})
+    auth_user = configurable.get("langgraph_auth_user", {})
+    
+    # Get the A2A key from auth user
+    a2a_key = auth_user.get("a2a_admin_agent_key")
+    
+    if a2a_key:
+        logger.info('Using A2A admin agent key from auth config')
+        return a2a_key
+    
+    # Fallback to env variable
+    logger.warning('No A2A key in auth config, falling back to env variable')
+    return os.getenv("A2A_ADMIN_AGENT_KEY")
 
 
 def _extract_text_from_a2a_response(response_dict: dict[str, Any]) -> str:
@@ -107,9 +140,16 @@ async def call_external_admin_a2a_agent(query: str) -> str:
     host = os.getenv('A2A_SERVER_HOST', '127.0.0.1')
 
     base_url = f"http://{host}:{port}"
-    api_key = os.getenv("A2A_API_KEY")
+    
+    # Get A2A API key from auth config (user-specific) or fallback to env
+    api_key = get_a2a_admin_agent_key_from_config()
+    
+    if not api_key:
+        logger.error('No A2A API key available. Set A2A_ADMIN_AGENT_KEY in auth config or A2A_API_KEY in environment.')
+        raise RuntimeError('A2A API key not available. Authentication may not be configured correctly.')
     
     logger.info('Using A2A_BASE_URL: %s', base_url)
+    logger.info('Using A2A API key from: %s', 'auth config' if _current_runtime_config else 'environment')
 
     # Create httpx client with timeout
     timeout = httpx.Timeout(30.0, connect=10.0)

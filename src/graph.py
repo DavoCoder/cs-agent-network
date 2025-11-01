@@ -22,11 +22,34 @@ from src.nodes.administration import (
     process_administration_ticket,
     should_continue as admin_should_continue,
 )
-from src.tools.administration_tools import call_external_admin_a2a_agent
+from src.tools.administration_tools import call_external_admin_a2a_agent, set_runtime_config
 from src.nodes.human_supervisor import ( 
     human_review_interrupt, 
     process_human_feedback,
 )
+
+async def admin_tools_with_config(state: ConversationState, config: RunnableConfig | None = None):
+    """
+    Wrapper for admin tools node that sets runtime config before tool invocation.
+    This allows tools to access authentication context.
+    """
+    # Set the runtime config as a dict for tool access
+    if config:
+        config_dict = {"configurable": dict(config.get("configurable", {}))}
+    else:
+        config_dict = {"configurable": {}}
+    
+    set_runtime_config(config_dict)
+    
+    try:
+        # Use standard ToolNode to execute tools
+        tools_node = ToolNode([call_external_admin_a2a_agent])
+        result = await tools_node.ainvoke(state, config)
+        return result
+    finally:
+        # Always clear config after use
+        set_runtime_config(None)
+
 
 async def create_agent_network(config: RunnableConfig):
     """ Create the main agent network graph using LangGraph 1.0. """
@@ -34,13 +57,9 @@ async def create_agent_network(config: RunnableConfig):
     tech_tools = await get_mcp_tools()
     billing_tools_node = ToolNode([search_billing_kb])
     technical_tools_node = ToolNode(tech_tools)
-    admin_tools_node = ToolNode([call_external_admin_a2a_agent])
     
-    # Create the graph builder
     builder = StateGraph(ConversationState, context_schema=Configuration)
     
-    # Add nodes for each agent
-    # Supervisor uses Command with routing
     builder.add_node(
         "supervisor", 
         classify_ticket_with_llm,
@@ -54,22 +73,20 @@ async def create_agent_network(config: RunnableConfig):
     builder.add_node("billing_tools", billing_tools_node)
 
     builder.add_node("administration",  process_administration_ticket)
-    builder.add_node("admin_tools", admin_tools_node)
+    builder.add_node("admin_tools", admin_tools_with_config)
     
     builder.add_node(
         "assessment",
         process_assessment,
-        ends=[END]  # Assessment always routes to END via Command.goto
+        ends=[END] 
     )
     
-    # Human supervisor nodes
     builder.add_node("human_review", human_review_interrupt)
     builder.add_node("process_feedback", process_human_feedback)
    
-    # Define workflow edges
+
     builder.add_edge(START, "supervisor")
 
-    # Technical agent ReAct-like routing
     builder.add_conditional_edges(
         "technical",
         technical_should_continue,
@@ -79,7 +96,6 @@ async def create_agent_network(config: RunnableConfig):
         },
     )
     
-    # Billing agent ReAct pattern routing
     builder.add_conditional_edges(
         "billing",
         should_continue,
@@ -89,8 +105,6 @@ async def create_agent_network(config: RunnableConfig):
         }
     )
 
-    # Administration agent routing - CENTRAL ROUTING HUB
-    # Administration node handles all routing decisions: admin_tools, human_review, or assessment
     builder.add_conditional_edges(
         "administration",
         admin_should_continue,
@@ -101,20 +115,12 @@ async def create_agent_network(config: RunnableConfig):
         }
     )
     
-    # Tools complete, loop back to agent
     builder.add_edge("billing_tools", "billing")
     builder.add_edge("technical_tools", "technical")
-    
-    # Admin tools ALWAYS routes back to administration (administration decides next step)
     builder.add_edge("admin_tools", "administration")
-    
-    # Human review flow
     builder.add_edge("human_review", "process_feedback")
-    
-    # Process feedback ALWAYS routes back to administration (administration decides next step)
     builder.add_edge("process_feedback", "administration")
     
-    # Compile the graph
     graph = builder.compile()
 
     return graph

@@ -58,8 +58,10 @@ class AdministrationAgent:
         email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
         emails = re.findall(email_pattern, user_query)
         
-        # Account management
-        if any(keyword in query_lower for keyword in ['delete account', 'close account', 'remove account']):
+        # Account management - flexible matching for delete/close/remove account
+        if (('delete' in query_lower and 'account' in query_lower) or 
+            ('close' in query_lower and 'account' in query_lower) or 
+            ('remove' in query_lower and 'account' in query_lower)):
             if is_confirmation and emails:
                 email = emails[0]
                 return (
@@ -116,8 +118,10 @@ class AdministrationAgent:
                 "Example: 'Yes, please proceed. Email: user@example.com, Name: John Doe, Organization: Acme Corp'"
             )
         
-        # Profile management
-        if any(keyword in query_lower for keyword in ['change email', 'update email', 'email address']):
+        # Profile management - flexible matching for email changes
+        if (('change' in query_lower and 'email' in query_lower) or 
+            ('update' in query_lower and 'email' in query_lower) or 
+            ('email' in query_lower and 'address' in query_lower)):
             if is_confirmation and len(emails) >= 1:
                 old_email = emails[0] if len(emails) >= 1 else "current email"
                 new_email = emails[1] if len(emails) >= 2 else emails[0]
@@ -141,7 +145,9 @@ class AdministrationAgent:
                 "Example: 'Yes, please proceed. Current: old@example.com, New: new@example.com'"
             )
         
-        if any(keyword in query_lower for keyword in ['change name', 'update name', 'name change']):
+        # Name change - flexible matching
+        if (('change' in query_lower and 'name' in query_lower) or 
+            ('update' in query_lower and 'name' in query_lower)):
             if is_confirmation:
                 name_matches = re.findall(r'(?:name|new name)[: ]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)', user_query, re.IGNORECASE)
                 new_name = name_matches[-1] if name_matches else "provided name"
@@ -162,9 +168,12 @@ class AdministrationAgent:
                 "Example: 'Yes, please proceed. Current: John Smith, New: John Doe'"
             )
         
-        # Permissions and roles
-        if any(keyword in query_lower for keyword in ['permission', 'role', 'access control']):
-            if 'developer role' in query_lower or 'developer permissions' in query_lower:
+        # Permissions and roles - flexible matching
+        if ('permission' in query_lower or 'role' in query_lower or 
+            ('access' in query_lower and 'control' in query_lower)):
+            # Developer role/permissions - flexible matching
+            if (('developer' in query_lower and 'role' in query_lower) or 
+                ('developer' in query_lower and 'permission' in query_lower)):
                 return (
                     "The Developer role includes the following permissions:\n"
                     "- Read and write access to code repositories\n"
@@ -180,8 +189,10 @@ class AdministrationAgent:
                 "Common roles include: Admin, Developer, Viewer, Billing Manager"
             )
         
-        # Team management
-        if any(keyword in query_lower for keyword in ['add team member', 'add member', 'invite team']):
+        # Team management - flexible matching for adding members
+        if (('add' in query_lower and 'team' in query_lower and 'member' in query_lower) or 
+            ('add' in query_lower and 'member' in query_lower) or 
+            ('invite' in query_lower and 'team' in query_lower)):
             if is_confirmation and emails:
                 email = emails[0]
                 role_match = re.search(r'(?:role|assign)[: ]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', user_query, re.IGNORECASE)
@@ -207,7 +218,10 @@ class AdministrationAgent:
                 "Example: 'Yes, please proceed. Email: member@example.com, Role: Developer'"
             )
         
-        if any(keyword in query_lower for keyword in ['remove team member', 'remove member', 'delete member']):
+        # Remove team member - flexible matching
+        if (('remove' in query_lower and 'team' in query_lower and 'member' in query_lower) or 
+            ('remove' in query_lower and 'member' in query_lower) or 
+            ('delete' in query_lower and 'member' in query_lower)):
             if is_confirmation and (emails or any(char.isalpha() for char in user_query)):
                 # Try to extract member identifier
                 member_identifier = emails[0] if emails else "the specified member"
@@ -232,8 +246,10 @@ class AdministrationAgent:
                 "Example: 'Yes, I confirm. Remove: member@example.com'"
             )
         
-        # Organization settings
-        if any(keyword in query_lower for keyword in ['organization', 'org settings', 'sub-account']):
+        # Organization settings - flexible matching
+        if ('organization' in query_lower or 
+            ('org' in query_lower and 'settings' in query_lower) or 
+            ('sub-account' in query_lower or ('sub' in query_lower and 'account' in query_lower))):
             if is_confirmation:
                 return (
                     "✅ Organization settings update confirmed and processed.\n\n"
@@ -251,8 +267,8 @@ class AdministrationAgent:
                 "Please provide details and confirm to proceed."
             )
         
-        # General admin help
-        if 'how' in query_lower and any(keyword in query_lower for keyword in ['admin', 'administrative', 'account']):
+        # General admin help - flexible matching
+        if 'how' in query_lower and ('admin' in query_lower or 'administrative' in query_lower or 'account' in query_lower):
             return (
                 "I can help with various administrative tasks:\n"
                 "- Account management (create, delete, update)\n"
