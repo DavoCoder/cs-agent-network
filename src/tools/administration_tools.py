@@ -226,7 +226,12 @@ async def call_external_admin_a2a_agent(query: str) -> str:
 
         except Exception as e:
             logger.error("Critical error fetching public agent card: %s", e, exc_info=True)
-            raise RuntimeError("Failed to fetch the public agent card. Cannot continue.") from e
+            error_msg = (
+                f"Failed to fetch the public agent card from {base_url}{AGENT_CARD_WELL_KNOWN_PATH}. "
+                f"Cannot continue. Error: {e}. "
+                f"Make sure the A2A server is running on {host}:{port}."
+            )
+            raise RuntimeError(error_msg) from e
 
         client = A2AClient(httpx_client=httpx_client, agent_card=final_agent_card_to_use)
         logger.info("A2AClient initialized.")

@@ -7,7 +7,7 @@
     "supervisor_agent_alternative": "./src/graph_alternative.py:build_supervisor_graph"
   },
   "env": ".env",
-  "python_version": "3.11",
+  "python_version": "3.13",
   "auth": {
     "path": "./src/auth.py:auth"
   }
