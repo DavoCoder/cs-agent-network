@@ -2,7 +2,7 @@
 Script to seed the Pinecone vector database with sample knowledge base articles.
 Run this after setting up your Pinecone account and API key.
 
-Run with: python -m src.scripts.seed_vector_kb
+Run with: python vector_db/seed_vector_kb.py
 """
 
 import sys

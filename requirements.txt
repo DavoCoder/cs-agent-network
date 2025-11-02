@@ -5,8 +5,8 @@ langgraph>=1.0.2
 langsmith==0.4.39
 
 # LangGraph CLI and API
-langgraph-cli[inmem]>=0.4.5
-langgraph-api>=0.4.0
+langgraph-cli>=0.4.0
+langgraph-api>=0.5.0
 langgraph-supervisor>=0.0.30
 langgraph-sdk>=0.1.73
 
@@ -15,14 +15,8 @@ langchain-openai==1.0.1
 langchain-anthropic==1.0.1
 langchain-mcp-adapters==0.1.12
 
-# Vector Store - Pinecone integration
-# Note: langchain-pinecone 0.2.12 requires langchain-core<1.0.0, so we use langchain-community for now
-# When langchain-pinecone supports langchain-core 1.0.x, switch to: langchain-pinecone>=0.3.0
-# langchain-pinecone>=0.3.0  # Uncomment when compatible version is available
-langchain-community==0.4.1  # Using community version until langchain-pinecone supports langchain-core 1.0.x
-
 # Vector DB and Embeddings
-# Note: Version 7.0.0+ required for compatibility with pinecone-plugin-assistant
+langchain-community==0.4.1
 pinecone>=7.0.0
 
 # Utilities
@@ -38,14 +32,14 @@ httpx>=0.28.1
 
 # A2A SDK
 a2a-sdk>=0.3.0
+python-a2a>=0.5.10
 
-# Testing
+# Optional: Testing dependencies
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 pytest-mock>=3.11.0
 
-# Code Quality
+# Optional: Code Quality dependencies
 black>=23.0.0
 pylint>=3.0.0
 isort>=5.12.0
-
