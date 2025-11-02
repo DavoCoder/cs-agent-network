@@ -25,7 +25,7 @@ try:
         if not hasattr(pinecone, 'Index'):
             pinecone.Index = PineconeIndex
     PINECONE_AVAILABLE = True
-except ImportError:
+except (ImportError, ModuleNotFoundError, Exception):  
     PINECONE_AVAILABLE = False
     USE_LANGCHAIN_PINECONE = False
 
