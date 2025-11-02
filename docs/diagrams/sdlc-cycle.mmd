@@ -1,0 +1,53 @@
+flowchart TD
+    Start([Start]) --> Problem[Problem Framing<br/>Business Context, Constraints, Metrics]
+    
+    Problem --> Design[System Design & Implementation]
+    Design --> DesignData[Data & Knowledge Design]
+    Design --> DesignNetwork[Agent Network Design]
+    Design --> DesignPrompt[Prompt & Policy Design]
+    Design --> DesignModel[Model Selection]
+    
+    DesignData --> Implementation[Implementation]
+    DesignNetwork --> Implementation
+    DesignPrompt --> Implementation
+    DesignModel --> Implementation
+    
+    Implementation --> Evaluation[Evaluation]
+    Evaluation --> EvalRun[Run Evaluations]
+    EvalRun --> EvalAnalyze[Identify Issues]
+    EvalAnalyze --> EvalRefine[Refine Prompts/Models/Logic]
+    EvalRefine --> EvalRun
+    
+    EvalAnalyze -->|Quality Threshold Met| Deploy[Deployment]
+    EvalRefine -.->|Iterate| Implementation
+    
+    Deploy --> DeployConfig[Pre-Deployment Config]
+    DeployConfig --> DeployCI[CI/CD Integration]
+    DeployCI --> DeployProd[Production Deployment]
+    
+    DeployProd --> AgentOps[AgentOps<br/>Observability & Operations]
+    AgentOps --> Observe[LangSmith Traces & Threads]
+    AgentOps --> Monitor[Monitoring & Alerting]
+    AgentOps --> Debug[Trace Analysis]
+    
+    Observe --> PostDeploy[Post-Deployment<br/>Monitoring & Governance]
+    Monitor --> PostDeploy
+    Debug --> PostDeploy
+    
+    PostDeploy --> Feedback[Collect Feedback]
+    Feedback --> Governance[Governance & Audit]
+    Governance --> Continuous[Continuous Improvement]
+    
+    Continuous -->|Refine| Design
+    Continuous -->|Optimize| AgentOps
+    Continuous -->|Enhance| PostDeploy
+    
+    style Problem fill:#e1f5ff
+    style Design fill:#fff4e1
+    style Implementation fill:#f0f0f0
+    style Evaluation fill:#ffe1f5
+    style Deploy fill:#e1ffe1
+    style AgentOps fill:#f5e1ff
+    style PostDeploy fill:#ffe1e1
+    style Continuous fill:#ffffe1
+
