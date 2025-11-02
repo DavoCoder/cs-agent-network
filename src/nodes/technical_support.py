@@ -1,6 +1,7 @@
 """
 Technical support node that answers developer questions using the MCP docs tool.
 """
+
 from typing import Literal
 
 from langchain_core.messages import SystemMessage
@@ -12,13 +13,17 @@ from src.tools.mcp_client import get_mcp_tools
 from src.utils.models import load_chat_model
 
 
-async def process_technical_ticket(state: ConversationState, runtime: RunnableConfig[Configuration]) -> dict:
+async def process_technical_ticket(
+    state: ConversationState, runtime: RunnableConfig[Configuration]
+) -> dict:
     """Technical support agent that answers developer questions using the MCP docs tool."""
     messages = state.get("messages", [])
 
     config = runtime.context if runtime.context else Configuration()
 
-    llm = load_chat_model(config.technical_agent_model, temperature= config.technical_agent_temperature)
+    llm = load_chat_model(
+        config.technical_agent_model, temperature=config.technical_agent_temperature
+    )
     tools = await get_mcp_tools()
     llm_with_tools = llm.bind_tools(tools)
 
@@ -40,4 +45,3 @@ def should_continue(state: ConversationState) -> Literal["technical_tools", "ass
         return "technical_tools"
     else:
         return "assessment"
-

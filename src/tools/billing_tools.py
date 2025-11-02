@@ -1,4 +1,5 @@
 """Billing-related tools for the agent network."""
+
 from langchain_core.tools import tool
 
 from src.tools.vector_store import retrieve_and_format_kb_results
