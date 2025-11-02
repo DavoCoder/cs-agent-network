@@ -147,6 +147,15 @@ uv run langgraph dev
 | **Interactive Testing** | Enable interactive testing via LangGraph Studio |
 | **Authentication** | Includes authentication (see `src/auth.py`) |
 
+#### Testing Your Agent
+
+Once the LangGraph server is running, you can test your graph(s) using:
+
+- **LangGraph Studio**: Built-in interactive testing interface
+- **Agent Chat UI**: Prebuilt conversational interface with tool visualization and time-travel debugging ([Agent Chat UI Documentation](https://docs.langchain.com/oss/python/langchain/ui))
+
+To use Agent Chat UI, visit the [hosted version](https://agentchat.vercel.app/) or run it locally, then connect to your server at `http://localhost:2024`.
+
 ### Running Both Servers
 
 For full functionality (especially administration agent), run both servers:
