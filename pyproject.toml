@@ -35,6 +35,7 @@ disable = [
     "C0103",  # invalid-name (for variable names)
     "R0903",  # too-few-public-methods
     "R0913",  # too-many-arguments
+    "R0801",  # duplicate-code (legitimate duplication for readability/flexibility)
 ]
 
 [tool.pylint.format]

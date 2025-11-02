@@ -27,7 +27,7 @@ _current_runtime_config: Optional[dict] = None
 
 def set_runtime_config(config: dict | None):
     """Set the runtime config for tool access."""
-    global _current_runtime_config
+    global _current_runtime_config  # pylint: disable=global-statement
     _current_runtime_config = config
 
 

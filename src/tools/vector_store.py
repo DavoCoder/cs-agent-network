@@ -137,7 +137,7 @@ _vector_store_manager: Optional[VectorStoreManager] = None
 
 def get_vector_store() -> Optional[VectorStoreManager]:
     """Get or create the global vector store manager instance."""
-    global _vector_store_manager
+    global _vector_store_manager  # pylint: disable=global-statement
 
     if not PINECONE_AVAILABLE:
         return None
