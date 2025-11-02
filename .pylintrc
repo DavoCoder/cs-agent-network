@@ -16,7 +16,9 @@ disable =
     too-few-public-methods,
     too-many-arguments,
     duplicate-code,
-    broad-exception-caught
+    broad-exception-caught,
+    too-many-nested-blocks,
+    import-error
 
 [FORMAT]
 # Maximum number of characters on a single line

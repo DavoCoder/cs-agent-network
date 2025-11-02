@@ -41,7 +41,8 @@ async def process_administration_ticket(
 
 
 def admin_should_continue(
-    state: ConversationState) -> Literal["admin_tools", "human_review", "assessment"]:
+    state: ConversationState,
+) -> Literal["admin_tools", "human_review", "assessment"]:
     """Central routing logic for administration agent."""
     messages = state.get("messages", [])
     if not messages:

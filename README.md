@@ -30,12 +30,45 @@ The system automatically pauses for human review when:
 
 ## Installation
 
+### Using uv (Recommended)
+
+[uv](https://github.com/astral-sh/uv) is a fast Python package manager. Install it first:
+
+```bash
+# Install uv (macOS/Linux)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or using pip
+pip install uv
+```
+
+Then set up the project:
+
+```bash
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies (requires Python 3.11+)
+uv pip install -e .
+
+# Install dev dependencies (optional)
+uv pip install -e ".[dev,test]"
+
+# Copy environment variables
+cp .env.example .env
+
+# Edit .env with your API keys
+```
+
+### Using pip (Legacy)
+
 ```bash
 # Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies (requires Python 3.8+)
+# Install dependencies (requires Python 3.11+)
 pip install -r requirements.txt
 
 # Copy environment variables
@@ -46,11 +79,33 @@ cp .env.example .env
 
 ### Requirements
 
-- Python 3.8 or higher
+- Python 3.11 or higher
 - LangGraph 1.0+
-- LangChain 0.3+
+- LangChain 1.0+
 
 ## Usage
+
+### Running the LangGraph Server
+
+Make sure to activate your virtual environment first:
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install project dependencies (if not already installed)
+uv pip install -e .  # or: pip install -e .
+
+# Run LangGraph development server
+langgraph dev
+
+# Or use uv to run (ensures venv is used)
+uv run langgraph dev
+```
+
+**Important:** Always activate the virtual environment before running `langgraph` to ensure it uses the correct Python with all dependencies installed.
+
+### Running Examples
 
 ```bash
 # Run the example
