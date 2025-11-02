@@ -1,0 +1,39 @@
+You are evaluating how well a system output prepares a human reviewer for making a decision about an administrative action.
+
+A high-quality human-in-the-loop (HITL) preparation should:
+
+1. **Clarity of Action Required**
+   - Clearly state what administrative action was requested (e.g., account creation, email update, team member addition)
+   - Make it immediately obvious what decision the human needs to make
+   - Avoid ambiguity about what will happen if confirmed
+
+2. **Completeness of Context**
+   - Include the original user query that triggered the action
+   - Include the complete tool/agent response with all relevant details
+   - Provide any necessary background information for decision-making
+   - Include relevant data points (emails, names, roles, etc.)
+
+3. **Clear Instructions**
+   - Explicitly state how to confirm (e.g., "Reply with 'Yes, proceed'" or "Confirm")
+   - Explicitly state how to cancel (e.g., "Reply with 'No' or 'Cancel'")
+   - Make it easy for the human to understand their options
+
+4. **Structure and Formatting**
+   - Use clear sections or formatting (headers, bullet points, etc.)
+   - Organize information logically (original query → tool response → action required)
+   - Make it easy to scan and understand quickly
+   - Use visual indicators (⚠️, **bold**, etc.) to highlight important information
+
+5. **Actionability**
+   - Enable the human to make an informed decision without needing to review previous conversation history
+   - Provide all critical information in one place
+   - Highlight any potential risks or irreversible consequences if applicable
+
+**Scoring Guidelines:**
+- **0.0-0.3**: Missing critical information, unclear what action is needed, or poorly structured
+- **0.4-0.6**: Contains some context but missing key elements or unclear instructions
+- **0.7-0.9**: Good preparation with most context and clear instructions, minor improvements possible
+- **1.0**: Excellent preparation with all context, clear instructions, and optimal structure
+
+Score based on how well the output meets these criteria. Be strict about completeness - the human should not need to search through conversation history to make an informed decision.
+

@@ -4,12 +4,13 @@ This directory contains evaluation tests for the customer support agent network,
 
 ## Structure
 
-- **`examples.py`**: Contains 10 test examples with inputs and expected outputs (trajectories, classifications, responses)
+- **`ds-curated.json`** and **`ds-synthetic.json`**: JSON files containing test examples with inputs and expected outputs (trajectories, classifications, responses)
 - **`evaluators.py`**: Contains evaluator functions including:
   - LLM-as-judge evaluator for final response correctness
   - Deterministic trajectory matching evaluator
   - Trajectory subsequence evaluator (partial match scoring)
   - Supervisor classification accuracy evaluator
+  - HITL preparation quality evaluator (LLM-as-judge)
 - **`run_evals.py`**: Main script to run all evaluations using LangSmith Client
 
 ## Evaluation Types
@@ -25,6 +26,21 @@ Checks how many of the expected steps the agent took, returning a score between 
 
 ### 4. Supervisor Classification
 Deterministically checks if the supervisor correctly classified the ticket into the right category (technical, billing, administration, or unclassifiable).
+
+### 5. HITL Preparation Quality (LLM-as-judge)
+Uses GPT-4o-mini as a judge to evaluate how well the output prepares a human reviewer for making a decision when human review is triggered. Only evaluates administration cases where `supervisor_classification="administration"` and `human_review` appears in the trajectory. Returns 1.0 (skipped) for non-administration cases or cases without human review.
+
+**Evaluation Context:**
+- Uses only data available in `outputs`: `response`, `trajectory`, `supervisor_classification`
+- Original user query from `inputs`
+- Does not depend on state fields that may not be available at evaluation time
+
+**Evaluation Criteria:**
+- **Clarity**: Does it clearly state what action needs to be taken?
+- **Completeness**: Does it include the original query AND the tool/agent response?
+- **Instructions**: Are instructions clear for how to proceed (confirm/cancel)?
+- **Structure**: Is the information well-formatted and easy to scan?
+- **Actionability**: Can the human make an informed decision without additional context?
 
 ## Running Evaluations
 
@@ -49,7 +65,7 @@ python -m tests.evals.run_evals
 
 This will:
 1. Create a dataset in LangSmith (if it doesn't exist)
-2. Run all 4 evaluation types
+2. Run all 5 evaluation types
 3. Display results in pandas DataFrames
 
 ### View Results in LangSmith
@@ -61,6 +77,7 @@ After running, you can view detailed results in the LangSmith UI:
   - `customer-support-trajectory-exact`
   - `customer-support-trajectory-subsequence`
   - `customer-support-classification`
+  - `customer-support-hitl-preparation`
 
 ## Test Examples
 
@@ -109,6 +126,7 @@ You can modify evaluators in `evaluators.py`:
 - **`trajectory_match`**: Change exact matching logic
 - **`trajectory_subsequence`**: Adjust partial matching algorithm
 - **`supervisor_classification_correct`**: Modify classification validation
+- **`hitl_preparation_quality`**: Modify HITL preparation evaluation criteria (edit `src/prompts/hitl_preparation_grader.txt`)
 
 ## References
 

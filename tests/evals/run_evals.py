@@ -17,6 +17,7 @@ from langsmith import Client
 from src.graph import create_agent_network
 from tests.evals.evaluators import (
     final_response_correct,
+    hitl_preparation_quality,
     supervisor_classification_correct,
     trajectory_match,
     trajectory_subsequence,
@@ -291,6 +292,7 @@ async def run_all_evals(examples_filename: str):
         trajectory_match,
         trajectory_subsequence,
         supervisor_classification_correct,
+        hitl_preparation_quality,
     ]
 
     print("\n" + "=" * 80)
@@ -301,7 +303,7 @@ async def run_all_evals(examples_filename: str):
     print("  2. Trajectory Matching (Exact Match)")
     print("  3. Trajectory Subsequence (Partial Match)")
     print("  4. Supervisor Classification Accuracy")
-    print("  5. Human Review Appropriate (State-based)")
+    print("  5. HITL Preparation Quality (LLM-as-judge)")
     print("=" * 80)
     print("\n⚠️  This will run the graph once per example and apply all evaluators")
     print("   to the same outputs for efficiency.\n")

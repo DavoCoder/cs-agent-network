@@ -1,0 +1,17 @@
+USER QUESTION: {question}
+
+CONTEXT WHEN HUMAN REVIEW WAS TRIGGERED:
+{context}
+
+Evaluate how well this output prepares a human reviewer for making a decision about an administrative action:
+1. Does it clearly state what administrative action needs to be taken?
+2. Is sufficient context provided for the human to understand the request?
+3. Are instructions clear for how to proceed (confirm/cancel)?
+4. Is the information well-structured for human review?
+
+Consider:
+- Clarity: Is it immediately clear what administrative decision the human needs to make?
+- Completeness: Does it include enough information about the original request and what action is being requested?
+- Actionability: Can the human make an informed decision based on this information without needing additional context?
+- Structure: Is the information formatted in a way that's easy to scan and understand?
+
