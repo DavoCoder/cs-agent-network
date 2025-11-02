@@ -1,5 +1,6 @@
 """Schema for assessment output."""
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
 

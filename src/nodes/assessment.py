@@ -1,14 +1,16 @@
 from typing import Literal
-from langchain_core.prompts import ChatPromptTemplate
+
 from langchain_core.messages import AIMessage
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 from langgraph.types import Command
-from src.state import ConversationState, AgentContext
-from src.utils.message_utils import extract_user_message
+
 from src.configuration import Configuration
-from src.utils.models import load_chat_model
 from src.schemas.assessment import Assessment
+from src.state import AgentContext, ConversationState
+from src.utils.message_utils import extract_user_message
+from src.utils.models import load_chat_model
 
 
 def process_assessment(state: ConversationState, runtime: RunnableConfig[Configuration]) -> Command[Literal[END]]:

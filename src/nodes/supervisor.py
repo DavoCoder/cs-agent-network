@@ -3,22 +3,28 @@ Supervisor node that classifies the customer's message and determines routing.
 """
 import logging
 from typing import Literal
+
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END
 from langgraph.types import Command
-from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import HumanMessage, SystemMessage
-from src.utils.models import load_chat_model
+
+from src.configuration import Configuration
+from src.schemas.classification import TicketClassification
 from src.state import ConversationState
-from src.utils.message_utils import extract_user_message, create_ai_message, format_conversation_history
+from src.utils.message_utils import (
+    create_ai_message,
+    extract_user_message,
+    format_conversation_history,
+)
+from src.utils.models import load_chat_model
 from src.utils.state_utils import (
+    build_classification_state_updates,
     create_fallback_classification,
     create_supervisor_agent_context,
     create_unclassifiable_agent_context,
     update_ticket_from_classification,
-    build_classification_state_updates
 )
-from src.configuration import Configuration
-from src.schemas.classification import TicketClassification
 
 logger = logging.getLogger(__name__)
 

@@ -2,31 +2,33 @@
 Customer support agent network graph using LangGraph 1.0.
 """
 from langchain_core.runnables import RunnableConfig
-from langgraph.graph import StateGraph, END, START
+from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
-from src.state import ConversationState
+
 from src.configuration import Configuration
-from src.nodes.supervisor import classify_ticket_with_llm
-from src.nodes.technical_support import (
-    process_technical_ticket,
-    should_continue as technical_should_continue,
-    get_mcp_tools,
-)
-from src.nodes.billing import (
-    process_billing_ticket,
-    should_continue,
-    search_billing_kb,
-)
-from src.nodes.assessment import process_assessment
 from src.nodes.administration import (
     process_administration_ticket,
-    should_continue as admin_should_continue,
 )
-from src.tools.administration_tools import call_external_admin_a2a_agent, set_runtime_config
-from src.nodes.human_supervisor import ( 
-    human_review_interrupt, 
+from src.nodes.administration import should_continue as admin_should_continue
+from src.nodes.assessment import process_assessment
+from src.nodes.billing import (
+    process_billing_ticket,
+    search_billing_kb,
+    should_continue,
+)
+from src.nodes.human_supervisor import (
+    human_review_interrupt,
     process_human_feedback,
 )
+from src.nodes.supervisor import classify_ticket_with_llm
+from src.nodes.technical_support import (
+    get_mcp_tools,
+    process_technical_ticket,
+)
+from src.nodes.technical_support import should_continue as technical_should_continue
+from src.state import ConversationState
+from src.tools.administration_tools import call_external_admin_a2a_agent, set_runtime_config
+
 
 async def admin_tools_with_config(state: ConversationState, config: RunnableConfig | None = None):
     """

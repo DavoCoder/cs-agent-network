@@ -2,12 +2,15 @@
 Technical support node that answers developer questions using the MCP docs tool.
 """
 from typing import Literal
+
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
-from src.state import ConversationState
+
 from src.configuration import Configuration
-from src.utils.models import load_chat_model
+from src.state import ConversationState
 from src.tools.mcp_client import get_mcp_tools
+from src.utils.models import load_chat_model
+
 
 async def process_technical_ticket(state: ConversationState, runtime: RunnableConfig[Configuration]) -> dict:
     """Technical support agent that answers developer questions using the MCP docs tool."""

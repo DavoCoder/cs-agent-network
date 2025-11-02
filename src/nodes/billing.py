@@ -1,10 +1,13 @@
 from typing import Literal
+
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
-from src.state import ConversationState
+
 from src.configuration import Configuration
-from src.utils.models import load_chat_model
+from src.state import ConversationState
 from src.tools.billing_tools import search_billing_kb
+from src.utils.models import load_chat_model
+
 
 def process_billing_ticket(state: ConversationState, runtime: RunnableConfig[Configuration]) -> dict:
     """ Billing agent that can search the billing knowledge base and generate responses. """

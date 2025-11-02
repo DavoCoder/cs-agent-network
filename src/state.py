@@ -1,6 +1,8 @@
-from typing import Optional, List, Literal, Dict
-from typing_extensions import TypedDict, NotRequired, Annotated
+from typing import Dict, List, Literal, Optional
+
 from langgraph.graph import MessagesState
+from typing_extensions import Annotated, NotRequired, TypedDict
+
 
 class TicketInfo(TypedDict):
     """Information about a customer support ticket"""

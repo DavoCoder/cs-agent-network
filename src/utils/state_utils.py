@@ -1,7 +1,8 @@
 """Utility functions for managing conversation state, tickets, and agent contexts."""
-from typing import Dict, Any
+from typing import Any, Dict
+
 from src.schemas.classification import TicketClassification
-from src.state import ConversationState, AgentContext
+from src.state import AgentContext, ConversationState
 
 
 def create_fallback_classification() -> TicketClassification:

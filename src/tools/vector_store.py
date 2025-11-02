@@ -1,14 +1,15 @@
 import os
 from typing import List, Optional
+
 from langchain_core.documents import Document
 
 # Conditional imports - gracefully handle missing dependencies
 # Priority: langchain-pinecone (preferred) -> langchain-community (fallback)
 try:
+    from langchain_openai import OpenAIEmbeddings
     from pinecone import Pinecone, ServerlessSpec
     from pinecone.db_data.index import Index as PineconeIndex
-    from langchain_openai import OpenAIEmbeddings
-    
+
     # Try langchain-pinecone first (preferred package, but requires langchain-core<1.0.0)
     # When langchain-pinecone supports langchain-core 1.0.x, this will work automatically
     USE_LANGCHAIN_PINECONE = False
@@ -18,10 +19,10 @@ try:
     except (ImportError, ModuleNotFoundError):
         # Fallback to langchain-community (compatible with langchain-core 1.0.x)
         # Note: langchain-community's Pinecone class is deprecated but works with current setup
-        from langchain_community.vectorstores import Pinecone as PineconeVectorStore
         # Monkey-patch pinecone module to have Index attribute for isinstance checks
         # This is needed because Pinecone 7.x moved Index class location
         import pinecone
+        from langchain_community.vectorstores import Pinecone as PineconeVectorStore
         if not hasattr(pinecone, 'Index'):
             pinecone.Index = PineconeIndex
     PINECONE_AVAILABLE = True

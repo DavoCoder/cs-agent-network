@@ -1,0 +1,64 @@
+[MASTER]
+# Use multiple processes to speed up Pylint
+jobs = 0
+
+# Python code to execute, usually for sys.path manipulation
+init-hook = 'import sys; sys.path.insert(0, ".")'
+
+# List of plugins
+load-plugins = 
+
+[MESSAGES CONTROL]
+# Disable specific messages
+disable = 
+    missing-docstring,
+    invalid-name,
+    too-few-public-methods,
+    too-many-arguments
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length = 100
+
+# Regexp for a line that is allowed to be longer than the limit
+ignore-long-lines = ^\s*(# )?<?https?://\S+>?$
+
+[BASIC]
+# Good variable names
+good-names = i,j,k,ex,Run,e,f,id,db,io
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args = 10
+
+# Maximum number of attributes for a class
+max-attributes = 15
+
+# Maximum number of boolean expressions in an if statement
+max-branches = 15
+
+# Maximum number of locals for function / method body
+max-locals = 20
+
+# Maximum number of return / yield for function / method body
+max-returns = 6
+
+# Maximum number of statements in function / method body
+max-statements = 50
+
+[IMPORTS]
+# Allow wildcard imports from modules that define __all__
+allow-wildcard-with-all = yes
+
+[REFACTORING]
+# Maximum number of nested blocks
+max-nested-blocks = 5
+
+[CLASSES]
+# List of member names to include in public interface
+include-naming-hint = yes
+
+[EXCEPTIONS]
+# Exceptions that will emit a warning when being caught
+overgeneral-exceptions = BaseException,Exception
+

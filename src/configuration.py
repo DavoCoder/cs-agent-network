@@ -1,8 +1,9 @@
 """Configuration for the agent network."""
 from typing import Literal
-from typing_extensions import Annotated
 
 from pydantic import BaseModel, Field
+from typing_extensions import Annotated
+
 from src.utils.prompt_loader import pull_externalized_prompt
 
 SYSTEM_PROMPT_DESCRIPTION = "The system prompt for the agent. Must be a string"
