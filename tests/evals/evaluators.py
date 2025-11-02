@@ -14,13 +14,20 @@ class Grade(BaseModel):
     """Compare the expected and actual answers and grade the actual answer."""
 
     reasoning: str = Field(
-        description="Explain your reasoning for the score, evaluating accuracy, completeness, and appropriateness."
+        description=(
+            "Explain your reasoning for the score, "
+            "evaluating accuracy, completeness, and appropriateness."
+        )
     )
     score: float = Field(
         ge=0.0,
         le=1.0,
-        description="Score between 0.0 and 1.0 indicating the level of accuracy and correctness. "
-        "0.0 = completely incorrect/unhelpful, 0.5 = partially correct, 1.0 = fully correct and appropriate.",
+        description=(
+            "Score between 0.0 and 1.0 indicating the level of accuracy and correctness. "
+            "0.0 = completely incorrect/unhelpful, "
+            "0.5 = partially correct, "
+            "1.0 = fully correct and appropriate."
+        ),
     )
 
 
@@ -32,7 +39,7 @@ def create_grader_llm():
 
 
 async def final_response_correct(inputs: dict, outputs: dict, reference_outputs: dict) -> float:
-    """LLM-as-judge evaluator for final response correctness. Returns a score between 0.0 and 1.0."""
+    """LLM-as-judge evaluator for final response correctness."""
     grader_llm = create_grader_llm()
 
     # Extract question from inputs

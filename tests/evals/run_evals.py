@@ -7,6 +7,7 @@ import asyncio
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -66,11 +67,11 @@ async def extract_final_response(state: dict) -> str:
             if msg.content:
                 print("Found final response in AIMessage format")
                 return str(msg.content)
-        elif isinstance(msg, dict):
+        if isinstance(msg, dict):
             if msg.get("type") == "ai" and msg.get("content"):
                 print("Found final response in dict format messages")
                 return str(msg["content"])
-            elif msg.get("content") and msg.get("type") != "tool":
+            if msg.get("content") and msg.get("type") != "tool":
                 print("Found final response in content of messages")
                 return str(msg["content"])
 
@@ -84,6 +85,7 @@ async def extract_trajectory(_state: dict, trajectory: list) -> list:
 
 async def extract_supervisor_classification(state: dict) -> str:
     """Extract supervisor classification from state."""
+    # pylint: disable=too-many-return-statements,too-many-branches
     # Primary source: current_ticket.category from State
     current_ticket = state.get("current_ticket", {})
     if isinstance(current_ticket, dict):
@@ -103,11 +105,11 @@ async def extract_supervisor_classification(state: dict) -> str:
             if "classified as" in first_entry:
                 if "technical" in first_entry:
                     return "technical"
-                elif "billing" in first_entry:
+                if "billing" in first_entry:
                     return "billing"
-                elif "administration" in first_entry:
+                if "administration" in first_entry:
                     return "administration"
-                elif "unclassifiable" in first_entry:
+                if "unclassifiable" in first_entry:
                     return "unclassifiable"
 
     # Tertiary source: agent_contexts (supervisor context)
@@ -123,9 +125,9 @@ async def extract_supervisor_classification(state: dict) -> str:
                     reasoning = context.get("reasoning", "")
                     if "technical" in reasoning.lower():
                         return "technical"
-                    elif "billing" in reasoning.lower():
+                    if "billing" in reasoning.lower():
                         return "billing"
-                    elif "administration" in reasoning.lower():
+                    if "administration" in reasoning.lower():
                         return "administration"
 
     return ""
@@ -334,7 +336,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "examples_file",
         type=str,
-        help="Name of the JSON file containing evaluation examples (e.g., ds-curated.json, ds-synthetic.json)",
+        help=(
+            "Name of the JSON file containing evaluation examples "
+            "(e.g., ds-curated.json, ds-synthetic.json)"
+        ),
     )
     args = parser.parse_args()
 
@@ -350,9 +355,8 @@ if __name__ == "__main__":
     print("Starting Evaluation Suite")
     print(f"{'='*80}")
     print(f"Examples file: {args.examples_file}")
-    print(
-        f"LangSmith API Key: {'*' * (len(langsmith_key) - 4) + langsmith_key[-4:] if langsmith_key else 'NOT SET'}"
-    )
+    masked_key = "*" * (len(langsmith_key) - 4) + langsmith_key[-4:] if langsmith_key else "NOT SET"
+    print(f"LangSmith API Key: {masked_key}")
     print(f"OpenAI API Key: {'SET' if openai_key else 'NOT SET'}")
     print(f"{'='*80}\n")
 
@@ -362,7 +366,7 @@ if __name__ == "__main__":
         # Handle error from Client initialization (missing LANGSMITH_API_KEY)
         print(f"ERROR: {e}")
         print(f"Looking for .env file in: {project_root}")
-        exit(1)
+        sys.exit(1)
     except FileNotFoundError as e:
         print(f"ERROR: {e}")
-        exit(1)
+        sys.exit(1)

@@ -1,11 +1,12 @@
 """
 Unit tests for the billing node.
-Tests process_billing_ticket and billing_should_continue functions with mocked external integrations.
+Tests process_billing_ticket and billing_should_continue functions
+with mocked external integrations.
 """
 
 from unittest.mock import Mock, patch
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
 from src.configuration import Configuration
 from src.nodes.billing import billing_should_continue, process_billing_ticket
@@ -153,7 +154,7 @@ class TestProcessBillingTicket:
 
     @patch("src.nodes.billing.load_chat_model")
     def test_processes_billing_ticket_falls_back_to_default_config(self, mock_load_model):
-        """Test that process_billing_ticket falls back to default config if runtime.context is None."""
+        """Test that process_billing_ticket falls back to default config."""
         # Setup mock LLM
         mock_llm = Mock()
         mock_llm_with_tools = Mock()
@@ -212,7 +213,7 @@ class TestBillingShouldContinue:
     """Tests for billing_should_continue routing function."""
 
     def test_routes_to_billing_tools_when_tool_calls_present(self):
-        """Test that billing_should_continue routes to billing_tools when tool calls are detected."""
+        """Test billing_should_continue routes to billing_tools when tool calls present."""
         # Setup state with tool calls
         state: ConversationState = {
             "messages": [
@@ -290,9 +291,7 @@ class TestBillingShouldContinue:
         assert result == "billing_tools"
 
     def test_routes_to_assessment_after_tool_response(self):
-        """Test that billing_should_continue routes to assessment after receiving tool response."""
-        from langchain_core.messages import ToolMessage
-
+        """Test billing_should_continue routes to assessment after tool response."""
         # Setup state with tool response (no new tool calls)
         state: ConversationState = {
             "messages": [

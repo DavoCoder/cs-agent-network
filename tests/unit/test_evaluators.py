@@ -75,7 +75,8 @@ class TestTrajectorySubsequence:
 
     def test_empty_expected_trajectory(self):
         """Test handling of empty expected trajectory."""
-        # According to implementation: if expected is empty, return 1.0 if actual is also empty, else 0.0
+        # According to implementation: if expected is empty,
+        # return 1.0 if actual is also empty, else 0.0
         outputs = {"trajectory": []}
         reference = {"trajectory": []}
         assert trajectory_subsequence(outputs, reference) == 1.0
