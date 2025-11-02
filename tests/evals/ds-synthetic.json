@@ -1,0 +1,333 @@
+[
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to create a new account"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To create a new account, I'll need the following information:\n\n**Required Information:**\n1. Email address\n2. Full name\n3. Organization name (optional)\n\nPlease provide this information and confirm by saying:\n- 'Yes, create the account' or 'Please proceed'\n- Include: Email, Name, and Organization (if applicable)\n\nExample: 'Yes, please proceed. Email: user@example.com, Name: John Doe, Organization: Acme Corp'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I add a team member?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To add a team member, I'll need the following information:\n\n**Required Information:**\n1. Email address of the team member\n2. Role/permission level\n\nPlease provide this information and confirm by saying:\n- 'Yes, send invitation' or 'Please proceed'\n- Include: Email and Role\n\nExample: 'Yes, send invitation. Email: member@example.com, Role: Developer'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to update my email address"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To update your email address, I'll need the following information:\n\n**Required Information:**\n1. Current email address (for verification)\n2. New email address\n\nPlease provide this information and confirm by saying:\n- 'Yes, update my email' or 'Please proceed'\n- Include: Current email and New email\n\nExample: 'Yes, update my email. Current: old@example.com, New: new@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to change my name on the account"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To change your name on the account, I'll need the following information:\n\n**Required Information:**\n1. Current name (for verification)\n2. New name\n\nPlease provide this information and confirm by saying:\n- 'Yes, change my name' or 'Please proceed'\n- Include: Current name and New name\n\nExample: 'Yes, change my name. Current: John Smith, New: John Doe'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How can I delete my account?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "⚠️ **ACCOUNT DELETION REQUEST**\n\nThis is an irreversible action that will permanently delete your account and all associated data including:\n- User profile and settings\n- Team memberships\n- Organization access\n- Historical data\n\nTo proceed, please confirm by replying with:\n- 'Yes, I confirm' or 'Proceed with deletion'\n- Your email address for verification\n\nExample: 'Yes, I confirm. My email is user@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to close my account permanently"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "⚠️ **ACCOUNT DELETION REQUEST**\n\nThis is an irreversible action that will permanently delete your account and all associated data including:\n- User profile and settings\n- Team memberships\n- Organization access\n- Historical data\n\nTo proceed, please confirm by replying with:\n- 'Yes, I confirm' or 'Proceed with deletion'\n- Your email address for verification\n\nExample: 'Yes, I confirm. My email is user@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you help me modify my permissions?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "I can help with permissions and role management. Please specify:\n\n1. **What type of permission change do you need?**\n   - Change your own role/permissions\n   - Modify permissions for a team member\n   - Update organization-level permissions\n\n2. **What role or permission level do you want?**\n   - Admin\n   - Developer\n   - Viewer\n   - Custom permissions\n\nPlease provide details and confirm by saying:\n- 'Yes, update permissions' or 'Please proceed'\n- Include: User email (if applicable), Role/Permission level\n\nExample: 'Yes, update permissions. Email: user@example.com, Role: Admin'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to invite someone to my organization"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To invite someone to your organization, I'll need the following information:\n\n**Required Information:**\n1. Email address of the person to invite\n2. Role/permission level for the invitation\n\nPlease provide this information and confirm by saying:\n- 'Yes, send invitation' or 'Please proceed'\n- Include: Email and Role\n\nExample: 'Yes, send invitation. Email: invite@example.com, Role: Developer'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I remove a team member from my organization?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To remove a team member from your organization, I'll need the following information:\n\n**Required Information:**\n1. Email address of the team member to remove\n\n⚠️ **Note:** This action will remove the team member's access to your organization. They will lose all permissions and access.\n\nPlease confirm by saying:\n- 'Yes, remove the member' or 'Please proceed'\n- Include: Email address\n\nExample: 'Yes, remove the member. Email: member@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to transfer ownership of my organization"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To transfer ownership of your organization, I'll need the following information:\n\n**Required Information:**\n1. Email address of the new owner\n2. Confirmation that you want to transfer ownership\n\n⚠️ **Important:** Transferring ownership will:\n- Transfer all organization settings and configurations\n- Change billing and subscription ownership\n- Grant full admin access to the new owner\n\nPlease confirm by saying:\n- 'Yes, transfer ownership' or 'Please proceed'\n- Include: New owner's email address\n\nExample: 'Yes, transfer ownership. New owner email: newowner@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How can I create a sub-account?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To create a sub-account, I'll need the following information:\n\n**Required Information:**\n1. Sub-account name\n2. Email address for the sub-account administrator\n3. Organization structure preferences\n\nPlease provide this information and confirm by saying:\n- 'Yes, create sub-account' or 'Please proceed'\n- Include: Sub-account name, Admin email\n\nExample: 'Yes, create sub-account. Name: Marketing Team, Admin email: admin@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to update my organization settings"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "I can help you update your organization settings. Please specify:\n\n**What settings would you like to update?**\n- Organization name\n- Billing information\n- Notification preferences\n- Security settings\n- Feature flags\n\nPlease provide details about what you want to change and confirm by saying:\n- 'Yes, update settings' or 'Please proceed'\n- Include: Specific setting to change and new value\n\nExample: 'Yes, update settings. Change organization name to: Acme Corp Updated'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you help me set up SSO for my organization?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To set up SSO (Single Sign-On) for your organization, I'll need the following information:\n\n**Required Information:**\n1. SSO provider (e.g., Okta, Azure AD, Google Workspace)\n2. SSO metadata URL or configuration file\n3. Domain verification information\n\nPlease provide this information and confirm by saying:\n- 'Yes, configure SSO' or 'Please proceed'\n- Include: SSO provider and metadata URL\n\nExample: 'Yes, configure SSO. Provider: Okta, Metadata URL: https://...'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to change my account's primary email"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To change your account's primary email address, I'll need the following information:\n\n**Required Information:**\n1. Current primary email (for verification)\n2. New primary email address\n3. Confirmation that you want to make this change\n\nPlease provide this information and confirm by saying:\n- 'Yes, change primary email' or 'Please proceed'\n- Include: Current email and New email\n\nExample: 'Yes, change primary email. Current: old@example.com, New: new@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I deactivate a user account in my organization?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To deactivate a user account in your organization, I'll need the following information:\n\n**Required Information:**\n1. Email address of the user to deactivate\n\n⚠️ **Note:** Deactivating an account will:\n- Prevent the user from logging in\n- Preserve their data and access history\n- Allow reactivation if needed\n\nPlease confirm by saying:\n- 'Yes, deactivate the account' or 'Please proceed'\n- Include: User email address\n\nExample: 'Yes, deactivate the account. Email: user@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to merge two accounts"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To merge two accounts, I'll need the following information:\n\n**Required Information:**\n1. Email addresses of both accounts to merge\n2. Which account should be the primary (keep data from this one)\n3. Confirmation that you understand this is an irreversible action\n\n⚠️ **Important:** Merging accounts will:\n- Combine data from both accounts\n- Transfer ownership and memberships\n- This action cannot be undone\n\nPlease confirm by saying:\n- 'Yes, merge accounts' or 'Please proceed'\n- Include: Primary account email and Secondary account email\n\nExample: 'Yes, merge accounts. Primary: primary@example.com, Secondary: secondary@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can I change my account's display name?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To change your account's display name, I'll need the following information:\n\n**Required Information:**\n1. Current display name (for verification)\n2. New display name\n\nPlease provide this information and confirm by saying:\n- 'Yes, change display name' or 'Please proceed'\n- Include: Current name and New name\n\nExample: 'Yes, change display name. Current: John Smith, New: John Doe'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to configure access controls for my team"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To configure access controls for your team, I'll need the following information:\n\n**Required Information:**\n1. Team or organization name\n2. Specific access control settings you want to configure\n   - IP restrictions\n   - Two-factor authentication requirements\n   - Session timeout settings\n   - API access controls\n\nPlease provide details and confirm by saying:\n- 'Yes, configure access controls' or 'Please proceed'\n- Include: Specific settings to configure\n\nExample: 'Yes, configure access controls. Enable 2FA requirement for all team members'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How can I archive my organization?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "⚠️ **ORGANIZATION ARCHIVAL REQUEST**\n\nArchiving your organization will:\n- Preserve all data and settings\n- Disable active subscriptions and billing\n- Make the organization read-only\n- Prevent new activity\n\nTo proceed, please confirm by replying with:\n- 'Yes, I confirm archive organization' or 'Proceed with archival'\n- Your organization name for verification\n\nExample: 'Yes, I confirm archive organization. Organization: Acme Corp'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to update my account's timezone settings"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To update your account's timezone settings, I'll need the following information:\n\n**Required Information:**\n1. Current timezone (optional, for verification)\n2. New timezone\n\nPlease provide this information and confirm by saying:\n- 'Yes, update timezone' or 'Please proceed'\n- Include: New timezone\n\nExample: 'Yes, update timezone. New timezone: America/New_York'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you help me set up custom roles for my organization?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To set up custom roles for your organization, I'll need the following information:\n\n**Required Information:**\n1. Role name\n2. Permissions to assign to the role\n3. Which users should have this role (optional)\n\nPlease provide this information and confirm by saying:\n- 'Yes, create custom role' or 'Please proceed'\n- Include: Role name and permissions\n\nExample: 'Yes, create custom role. Name: Content Manager, Permissions: Read, Write, Publish'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to enable API access for my organization"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To enable API access for your organization, I'll need the following information:\n\n**Required Information:**\n1. Organization name\n2. API access level (read-only, read-write, full access)\n3. IP restrictions (optional)\n\nPlease provide this information and confirm by saying:\n- 'Yes, enable API access' or 'Please proceed'\n- Include: Access level and restrictions\n\nExample: 'Yes, enable API access. Level: read-write, IP restrictions: 192.168.1.0/24'"
+    }
+  }
+]
+

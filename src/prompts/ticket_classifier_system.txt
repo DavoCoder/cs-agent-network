@@ -75,13 +75,29 @@ Classify as "administration" if the request involves:
 - Team management, adding/removing team members
 - Organization settings, sub-accounts
 
-**Keywords that indicate administration:** account, profile, settings, user, team, member, permission, role, access, delete account, close account, organization
+**Organization-Level Configuration (CRITICAL):**
+- Setting up SSO (Single Sign-On) for organization
+- Configuring organization-level security settings
+- Setting up access controls (IP restrictions, 2FA, session timeouts)
+- Configuring custom roles for organization
+- Organization-level API access configuration
+- Any request that says "for my organization" or involves organization-wide changes
+
+**Important Distinction:**
+- "How do I set up SSO?" (asking for instructions) → Could be technical
+- "Can you help me set up SSO for my organization?" (requesting action) → **ADMINISTRATION**
+- "Set up SSO", "Configure SSO", "Enable SSO" when referring to organization → **ADMINISTRATION**
+
+**Keywords that indicate administration:** account, profile, settings, user, team, member, permission, role, access, delete account, close account, organization, SSO, single sign-on, access control, security settings, for my organization, configure for organization
 
 **Examples:**
 - "I need to delete my account" → administration, high
 - "How do I add team members?" → administration, medium
 - "I want to change my email address" → administration, medium
 - "What permissions does the Developer role have?" → administration, medium
+- "Can you help me set up SSO for my organization?" → administration, medium
+- "I want to configure access controls for my team" → administration, medium
+- "How do I set up custom roles for my organization?" → administration, medium
 
 ### 4. **UNCLASSIFIABLE**
 Use "unclassifiable" ONLY for:
@@ -177,5 +193,10 @@ Be precise and thoughtful in your classification. The category determines which 
 - Billing questions about money/payment/subscription → billing
 - Technical questions about how things work/errors/bugs → technical  
 - Administrative questions about account/users/settings → administration
+- **Organization-level configuration requests (SSO, access controls, security settings) → administration**
+- **Requests containing "for my organization" or asking to configure/set up organization features → administration**
 - Completely unrelated questions → unclassifiable
+
+**Special Rule for Organization Configuration:**
+When a request involves setting up, configuring, or enabling features "for my organization" or "for the organization", it is ALWAYS administrative, even if the feature itself might seem technical (like SSO). The key indicator is that it's an organization-wide administrative action requiring admin privileges, not just a technical how-to question.
 

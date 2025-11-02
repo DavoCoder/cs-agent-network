@@ -86,8 +86,9 @@ class AdministrationAgent:
                 "Example: 'Yes, I confirm. My email is user@example.com'"
             )
         
-        # Check for account creation - flexible matching to catch "create account", "create the account", "create a new account", etc.
-        if ('create' in query_lower and 'account' in query_lower) or 'new account' in query_lower:
+        # Check for account creation - flexible matching to catch "create account", "create the account", "create a new account", "account creation", etc.
+        has_create = 'create' in query_lower or 'creation' in query_lower
+        if (has_create and 'account' in query_lower) or 'new account' in query_lower:
             if is_confirmation:
                 # Extract name if provided
                 name_match = re.search(r'(?:name|full name)[: ]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)', user_query, re.IGNORECASE)

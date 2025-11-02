@@ -1,0 +1,153 @@
+[
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I authenticate with the API?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "technical", "technical_tools", "technical", "assessment"],
+      "supervisor_classification": "technical",
+      "response": "Technical answer about API authentication, including setup instructions for API keys, headers, and environment variables. Should reference official documentation."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How much does the Pro plan cost?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "billing", "billing_tools", "billing", "assessment"],
+      "supervisor_classification": "billing",
+      "response": "Billing information about Pro plan pricing, including cost details and plan comparison. Should reference knowledge base and be transparent about pricing."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to create a new account"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To create a new account, I'll need the following information:\n\n**Required Information:**\n1. Email address\n2. Full name\n3. Organization name (optional)\n\nPlease provide this information and confirm by saying:\n- 'Yes, create the account' or 'Please proceed'\n- Include: Email, Name, and Organization (if applicable)\n\nExample: 'Yes, please proceed. Email: user@example.com, Name: John Doe, Organization: Acme Corp'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm getting a 500 error from the API"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "technical", "technical_tools", "technical", "assessment"],
+      "supervisor_classification": "technical",
+      "response": "Technical troubleshooting for 500 errors, including error code explanation, troubleshooting steps, and references to documentation or troubleshooting guides."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can I get a refund for my last purchase?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "billing", "billing_tools", "billing", "assessment"],
+      "supervisor_classification": "billing",
+      "response": "Billing information about refund policies and processes. Should reference knowledge base policies, be empathetic, and offer human escalation for sensitive refund cases."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I add a team member?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To add a team member, I'll need the following information:\n\n**Required Information:**\n1. Email address of the team member\n2. Role/permission level\n\nPlease provide this information and confirm by saying:\n- 'Yes, send invitation' or 'Please proceed'\n- Include: Email and Role\n\nExample: 'Yes, send invitation. Email: member@example.com, Role: Developer'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I set up webhooks?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "technical", "technical_tools", "technical", "assessment"],
+      "supervisor_classification": "technical",
+      "response": "Technical documentation about webhook setup, including supported endpoints, configuration steps, and code examples. Should reference official documentation."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the difference between the plans?"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "billing", "billing_tools", "billing", "assessment"],
+      "supervisor_classification": "billing",
+      "response": "Billing information comparing different subscription plans, including features, pricing differences, and upgrade/downgrade options. Should reference knowledge base."
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to update my email address"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor", "administration", "admin_tools", "administration", "human_review"],
+      "supervisor_classification": "administration",
+      "response": "To update your email address, I'll need the following information:\n\n**Required Information:**\n1. Current email address (for verification)\n2. New email address\n\nPlease provide this information and confirm by saying:\n- 'Yes, update my email' or 'Please proceed'\n- Include: Current email and New email\n\nExample: 'Yes, update my email. Current: old@example.com, New: new@example.com'"
+    }
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Thank you for your help!"
+        }
+      ]
+    },
+    "outputs": {
+      "trajectory": ["supervisor"],
+      "supervisor_classification": "unclassifiable",
+      "response": "Friendly acknowledgment response expressing gratitude. Should include the default unclassifiable message with a thank you acknowledgment."
+    }
+  }
+]
+
