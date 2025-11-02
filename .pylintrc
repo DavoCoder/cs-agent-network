@@ -15,7 +15,8 @@ disable =
     invalid-name,
     too-few-public-methods,
     too-many-arguments,
-    duplicate-code
+    duplicate-code,
+    broad-exception-caught
 
 [FORMAT]
 # Maximum number of characters on a single line

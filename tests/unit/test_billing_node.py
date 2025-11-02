@@ -4,11 +4,12 @@ Tests process_billing_ticket and billing_should_continue functions with mocked e
 """
 
 from unittest.mock import Mock, patch
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+
+from src.configuration import Configuration
 from src.nodes.billing import billing_should_continue, process_billing_ticket
 from src.state import ConversationState
-from src.configuration import Configuration
 
 
 class TestProcessBillingTicket:

@@ -2,8 +2,10 @@
 Evaluators for the customer support agent network.
 Includes LLM-as-judge, trajectory matching, and supervisor classification evaluators.
 """
-from pydantic import BaseModel, Field
+
 from langchain.chat_models import init_chat_model
+from pydantic import BaseModel, Field
+
 from src.utils.prompt_loader import pull_externalized_prompt
 
 
@@ -18,8 +20,9 @@ class Grade(BaseModel):
         ge=0.0,
         le=1.0,
         description="Score between 0.0 and 1.0 indicating the level of accuracy and correctness. "
-        "0.0 = completely incorrect/unhelpful, 0.5 = partially correct, 1.0 = fully correct and appropriate."
+        "0.0 = completely incorrect/unhelpful, 0.5 = partially correct, 1.0 = fully correct and appropriate.",
     )
+
 
 def create_grader_llm():
     """Create an LLM configured for grading."""
@@ -28,19 +31,19 @@ def create_grader_llm():
     )
 
 
-async def final_response_correct(
-    inputs: dict, outputs: dict, reference_outputs: dict
-) -> float:
-    """ LLM-as-judge evaluator for final response correctness. Returns a score between 0.0 and 1.0. """
+async def final_response_correct(inputs: dict, outputs: dict, reference_outputs: dict) -> float:
+    """LLM-as-judge evaluator for final response correctness. Returns a score between 0.0 and 1.0."""
     grader_llm = create_grader_llm()
-    
+
     # Extract question from inputs
-    question = inputs["messages"][0]["content"] if inputs.get("messages") else inputs.get("question", "")
-    
+    question = (
+        inputs["messages"][0]["content"] if inputs.get("messages") else inputs.get("question", "")
+    )
+
     # Extract actual and expected responses
     ground_truth = reference_outputs.get("response", "")
     agent_network_response = outputs.get("response", "")
-    
+
     # Extract domain context from state if available
     domain_context = ""
     state = outputs.get("state", {})
@@ -50,7 +53,7 @@ async def final_response_correct(
             category = current_ticket.get("category", "")
             if category:
                 domain_context = f"\nDOMAIN/CATEGORY: {category}"
-    
+
     # Build evaluation message
     user_message = f"""QUESTION: {question}
 GROUND TRUTH RESPONSE: {ground_truth}
@@ -58,7 +61,7 @@ AGENT NETWORK RESPONSE: {agent_network_response}{domain_context}"""
 
     # Load grader instructions (from file or LangSmith)
     grader_instructions = pull_externalized_prompt("grader_system", index=0)
-    
+
     grade = await grader_llm.ainvoke(
         [
             {"role": "system", "content": grader_instructions},
@@ -69,24 +72,24 @@ AGENT NETWORK RESPONSE: {agent_network_response}{domain_context}"""
 
 
 def trajectory_match(outputs: dict, reference_outputs: dict) -> bool:
-    """ Deterministic evaluator for trajectory matching. """
+    """Deterministic evaluator for trajectory matching."""
     actual_trajectory = outputs.get("trajectory", [])
     expected_trajectory = reference_outputs.get("trajectory", [])
-    
+
     if len(actual_trajectory) != len(expected_trajectory):
         return False
-    
+
     return actual_trajectory == expected_trajectory
 
 
 def trajectory_subsequence(outputs: dict, reference_outputs: dict) -> float:
-    """ Deterministic evaluator for trajectory subsequence. """
+    """Deterministic evaluator for trajectory subsequence."""
     actual_trajectory = outputs.get("trajectory", [])
     expected_trajectory = reference_outputs.get("trajectory", [])
-    
+
     if len(expected_trajectory) == 0:
         return 1.0 if len(actual_trajectory) == 0 else 0.0
-    
+
     if len(expected_trajectory) > len(actual_trajectory):
         return 0.0
 
@@ -101,9 +104,8 @@ def trajectory_subsequence(outputs: dict, reference_outputs: dict) -> float:
 
 
 def supervisor_classification_correct(outputs: dict, reference_outputs: dict) -> bool:
-    """ Deterministic evaluator for supervisor classification. """
+    """Deterministic evaluator for supervisor classification."""
     actual_classification = outputs.get("supervisor_classification", "")
     expected_classification = reference_outputs.get("supervisor_classification", "")
-    
-    return actual_classification == expected_classification
 
+    return actual_classification == expected_classification

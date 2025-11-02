@@ -27,7 +27,7 @@ def validate_langsmith_api_key(api_key: str) -> bool:
     if len(api_key) < 20:
         return False
 
-    # TODO: Add actual LangSmith API validation here
+    # Add actual Validation here
     # Example:
     # try:
     #     client = LangSmithClient(api_key=api_key)

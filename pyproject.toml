@@ -36,6 +36,7 @@ disable = [
     "R0903",  # too-few-public-methods
     "R0913",  # too-many-arguments
     "R0801",  # duplicate-code (legitimate duplication for readability/flexibility)
+    "W0718",  # broad-exception-caught (catching Exception is sometimes necessary for graceful degradation)
 ]
 
 [tool.pylint.format]
