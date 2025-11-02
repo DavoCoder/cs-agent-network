@@ -27,7 +27,7 @@ def process_billing_ticket(
     return {"messages": [response]}
 
 
-def should_continue(state: ConversationState) -> Literal["billing_tools", "assessment"]:
+def billing_should_continue(state: ConversationState) -> Literal["billing_tools", "assessment"]:
     """Determines whether to route to tools or to assessment."""
     messages = state.get("messages", [])
     if not messages:
@@ -36,5 +36,4 @@ def should_continue(state: ConversationState) -> Literal["billing_tools", "asses
     last_message = messages[-1]
     if hasattr(last_message, "tool_calls") and last_message.tool_calls:
         return "billing_tools"
-    else:
-        return "assessment"
+    return "assessment"

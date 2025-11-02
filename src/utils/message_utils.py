@@ -32,7 +32,7 @@ def extract_user_message(messages):
         """Helper to recursively extract text from various content formats"""
         if isinstance(content, str):
             return content
-        elif isinstance(content, list):
+        if isinstance(content, list):
             # Process list of items
             for item in content:
                 if isinstance(item, dict):
@@ -43,11 +43,11 @@ def extract_user_message(messages):
                 result = extract_text_from_content(item)
                 if result:
                     return result
-        elif isinstance(content, dict):
+        if isinstance(content, dict):
             # Check for 'text' or 'content' in dict
             if "text" in content:
                 return content["text"]
-            elif "content" in content:
+            if "content" in content:
                 return extract_text_from_content(content["content"])
         return ""
 
@@ -103,7 +103,8 @@ def find_tool_response_and_query(messages: list, tool_name: str) -> tuple[str | 
                 tool_response = content if isinstance(content, str) else str(content)
                 tool_call_id = getattr(msg, "tool_call_id", None)
 
-                # Find the original query - look for tool call with matching ID, then fallback to user message
+                # Find the original query - look for tool call with matching ID, then
+                # fallback to user message
                 for prev_msg in reversed(messages):
                     if prev_msg == msg:
                         continue  # Skip the ToolMessage itself
@@ -185,12 +186,12 @@ def format_conversation_history(messages: list, max_messages: int = 10) -> str:
             content = msg.content
             if isinstance(content, str):
                 return content
-            elif isinstance(content, list):
+            if isinstance(content, list):
                 # Extract from list of content parts
                 for item in content:
                     if isinstance(item, dict) and "text" in item:
                         return item["text"]
-                    elif isinstance(item, str):
+                    if isinstance(item, str):
                         return item
         return ""
 

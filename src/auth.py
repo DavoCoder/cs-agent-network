@@ -79,7 +79,9 @@ async def authenticate(headers: dict) -> Auth.types.MinimalUserDict:
         logger.warning("No API key found in request headers")
         raise Auth.exceptions.HTTPException(
             status_code=401,
-            detail="Missing API key. Please provide x-api-key header or Authorization Bearer token.",
+            detail=(
+                "Missing API key. " "Please provide x-api-key header or Authorization Bearer token."
+            ),
         )
 
     # Validate the API key

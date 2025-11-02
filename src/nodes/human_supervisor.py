@@ -24,8 +24,9 @@ def human_review_interrupt(
     # Get configuration
     config = runtime.context if runtime.context else Configuration()
 
-    # Note: This node should only be called from administration when a tool result needs confirmation
-    # The administration node's should_continue handles the routing logic
+    # Note: This node should only be called from administration when a tool result
+    # needs confirmation. The administration node's admin_should_continue handles
+    # the routing logic
 
     # Find admin tool response and original query
     admin_tool_response, admin_original_query = find_tool_response_and_query(

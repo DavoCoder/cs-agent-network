@@ -40,7 +40,7 @@ async def process_administration_ticket(
     return {"messages": [response]}
 
 
-def should_continue(
+def admin_should_continue(
     state: ConversationState, runtime: RunnableConfig[Configuration] | None = None  # noqa: ARG001
 ) -> Literal["admin_tools", "human_review", "assessment"]:
     """Central routing logic for administration agent."""
@@ -69,19 +69,23 @@ def should_continue(
         if admin_confirmation_processed:
             # Second tool call completed, route to assessment
             logger.info(
-                "Administration: Confirmation processed, second tool call completed, routing to assessment"
+                "Administration: Confirmation processed, second tool call completed, "
+                "routing to assessment"
             )
             return "assessment"
-        elif not admin_confirmation_pending:
+        if not admin_confirmation_pending:
             # First tool call completed, needs human confirmation
             logger.info(
-                "Administration: Tool result detected, needs human confirmation, routing to human_review"
+                "Administration: Tool result detected, needs human confirmation, "
+                "routing to human_review"
             )
             return "human_review"
         # If admin_confirmation_pending is True, we're waiting for user response
-        # This shouldn't happen here (should be in process_feedback), but route to assessment as fallback
+        # This shouldn't happen here (should be in process_feedback), but route to
+        # assessment as fallback
         logger.warning(
-            "Administration: Unexpected state - confirmation pending but in should_continue, routing to assessment"
+            "Administration: Unexpected state - confirmation pending but in "
+            "admin_should_continue, routing to assessment"
         )
         return "assessment"
 

@@ -127,7 +127,8 @@ async def call_external_admin_a2a_agent(query: str) -> str:
     - Organization Settings: Manage organization configurations, sub-accounts, enterprise settings
 
     **When to use this tool:**
-    - User asks "How to..." questions about administrative tasks (e.g., "How can I create a new account?")
+    - User asks "How to..." questions about administrative tasks
+      (e.g., "How can I create a new account?")
     - User requests administrative actions (e.g., "I want to delete my account", "Update my email")
     - User asks about permissions, roles, or access control
     - User wants to manage team members or organization settings
@@ -156,7 +157,8 @@ async def call_external_admin_a2a_agent(query: str) -> str:
 
     if not api_key:
         logger.error(
-            "No A2A API key available. Set A2A_ADMIN_AGENT_KEY in auth config or A2A_API_KEY in environment."
+            "No A2A API key available. "
+            "Set A2A_ADMIN_AGENT_KEY in auth config or A2A_API_KEY in environment."
         )
         raise RuntimeError(
             "A2A API key not available. Authentication may not be configured correctly."
@@ -194,7 +196,8 @@ async def call_external_admin_a2a_agent(query: str) -> str:
             if _public_card.supports_authenticated_extended_card:
                 try:
                     logger.info(
-                        "\nPublic card supports authenticated extended card. Attempting to fetch from: %s%s",
+                        "\nPublic card supports authenticated extended card. "
+                        "Attempting to fetch from: %s%s",
                         base_url,
                         EXTENDED_AGENT_CARD_PATH,
                     )
@@ -217,7 +220,8 @@ async def call_external_admin_a2a_agent(query: str) -> str:
                     )
             elif _public_card:  # supports_authenticated_extended_card is False or None
                 logger.info(
-                    "\nPublic card does not indicate support for an extended card. Using public card."
+                    "\nPublic card does not indicate support for an extended card. "
+                    "Using public card."
                 )
 
         except Exception as e:

@@ -63,11 +63,14 @@ class VectorStoreManager:
         # Initialize vector store
         if USE_LANGCHAIN_PINECONE:
             # langchain-pinecone API (when compatible version is available)
-            # Note: Check langchain-pinecone docs for current API when version 0.3.0+ supports langchain-core 1.0.x
+            # Note: Check langchain-pinecone docs for current API when version 0.3.0+
+            # supports langchain-core 1.0.x
             self.vector_store = PineconeVectorStore(index=self.index, embedding=self.embeddings)
         else:
-            # langchain-community API (fallback, deprecated but compatible with langchain-core 1.0.x)
-            # text_key specifies the key in Pinecone metadata where the text content is stored
+            # langchain-community API (fallback, deprecated but compatible with
+            # langchain-core 1.0.x)
+            # text_key specifies the key in Pinecone metadata where the text content
+            # is stored
             self.vector_store = PineconeVectorStore(
                 index=self.index,
                 embedding=self.embeddings,

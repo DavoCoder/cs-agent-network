@@ -8,14 +8,14 @@ from langgraph.prebuilt import ToolNode
 
 from src.configuration import Configuration
 from src.nodes.administration import (
+    admin_should_continue,
     process_administration_ticket,
 )
-from src.nodes.administration import should_continue as admin_should_continue
 from src.nodes.assessment import process_assessment
 from src.nodes.billing import (
+    billing_should_continue,
     process_billing_ticket,
     search_billing_kb,
-    should_continue,
 )
 from src.nodes.human_supervisor import (
     human_review_interrupt,
@@ -25,8 +25,8 @@ from src.nodes.supervisor import classify_ticket_with_llm
 from src.nodes.technical_support import (
     get_mcp_tools,
     process_technical_ticket,
+    technical_should_continue,
 )
-from src.nodes.technical_support import should_continue as technical_should_continue
 from src.state import ConversationState
 from src.tools.administration_tools import call_external_admin_a2a_agent, set_runtime_config
 
@@ -90,7 +90,9 @@ async def create_agent_network(config: RunnableConfig):
     )
 
     builder.add_conditional_edges(
-        "billing", should_continue, {"billing_tools": "billing_tools", "assessment": "assessment"}
+        "billing",
+        billing_should_continue,
+        {"billing_tools": "billing_tools", "assessment": "assessment"},
     )
 
     builder.add_conditional_edges(

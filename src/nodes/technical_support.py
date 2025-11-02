@@ -34,7 +34,7 @@ async def process_technical_ticket(
     return {"messages": [response]}
 
 
-def should_continue(state: ConversationState) -> Literal["technical_tools", "assessment"]:
+def technical_should_continue(state: ConversationState) -> Literal["technical_tools", "assessment"]:
     """Determines whether to route to tools or to assessment."""
     messages = state.get("messages", [])
     if not messages:
@@ -43,5 +43,4 @@ def should_continue(state: ConversationState) -> Literal["technical_tools", "ass
     last_message = messages[-1]
     if hasattr(last_message, "tool_calls") and last_message.tool_calls:
         return "technical_tools"
-    else:
-        return "assessment"
+    return "assessment"
