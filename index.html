@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Support Agent Network - Executive Summary</title>
+    <script>
+        // Global GitHub base URL - update this if repository location changes
+        const GITHUB_BASE_URL = 'https://github.com/DavoCoder/cs-agent-network/blob/main';
+    </script>
     <style>
         * {
             margin: 0;
@@ -843,5 +847,26 @@
             </p>
         </footer>
     </div>
+    
+    <script>
+        // Convert all relative .md links to full GitHub URLs
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href$=".md"]');
+            links.forEach(function(link) {
+                let href = link.getAttribute('href');
+                // Skip if already a full URL
+                if (href.startsWith('http://') || href.startsWith('https://')) {
+                    return;
+                }
+                // Remove leading ./ if present
+                if (href.startsWith('./')) {
+                    href = href.substring(2);
+                }
+                // Convert relative path to GitHub blob URL
+                const githubUrl = GITHUB_BASE_URL + '/' + href;
+                link.setAttribute('href', githubUrl);
+            });
+        });
+    </script>
 </body>
 </html>
