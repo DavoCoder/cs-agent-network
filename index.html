@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Agent Network - Executive Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 15px 40px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        section {
+            padding: 40px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #e7e9fd;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #e7e9fd 0%, #f0e6ff 100%);
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .metric-card .label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .status-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin: 8px 0;
+            line-height: 1.8;
+        }
+        
+        .diagram-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .diagram-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            section {
+                padding: 25px 20px;
+            }
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .phase-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .phase-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Customer Support Agent Network</h1>
+            <p>Executive Summary & Technical Overview</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.85;">Multi-Agent System for Intelligent Customer Support</p>
+        </header>
+        
+        <nav class="nav">
+            <a href="#business">Business Overview</a>
+            <a href="#sdlc">SDLC Process</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#alignment">Solution Alignment</a>
+            <a href="#results">Results</a>
+            <a href="#enhancements">Enhancements</a>
+            <a href="#developers">Developers</a>
+        </nav>
+        
+        <section id="business">
+            <h2>1. Business Overview</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/BUSINESS_OVERVIEW.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <h3>Company Context: Acme Corp.</h3>
+            <p>Mid-size technology company providing cloud infrastructure and developer tools to enterprise clients, processing <strong>hundreds of support tickets daily</strong> across technical, billing, and administrative domains.</p>
+            
+            <h3>Key Challenges</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Challenge</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Overwhelmed Team</strong></td>
+                        <td>High ticket volume, complex routing, inconsistent triage, manual bottlenecks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain Expertise Required</strong></td>
+                        <td>Different ticket types need specialized knowledge (Technical, Billing, Administrative)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Regulatory Compliance</strong></td>
+                        <td>Mandatory human oversight for administrative actions (explicit consent required)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Legacy Systems</strong></td>
+                        <td>Existing Pinecone KB and A2A administrative agent must be integrated</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost Pressures</strong></td>
+                        <td>High agent workload, 35% escalation rate, 4-6 hour first response times</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Target KPIs</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="label">Resolution Time</div>
+                    <div class="value">12-24h</div>
+                    <div class="label">(vs 48-72h current)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">First Response</div>
+                    <div class="value">&lt;2h</div>
+                    <div class="label">(vs 4-6h current)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Cost Reduction</div>
+                    <div class="value">50%</div>
+                    <div class="label">($150-200 → $75-100)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Customer Satisfaction</div>
+                    <div class="value">4.5+</div>
+                    <div class="label">(vs 3.2/5.0 current)</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="sdlc">
+            <h2>2. SDLC for Agentic AI</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/SDLC_AGENTIC_AI.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <div class="diagram-container">
+                <img src="docs/img/sdlc-cycle.png" alt="SDLC Iterative Development Cycle">
+            </div>
+            
+            <div class="highlight-box">
+                <strong>Key Difference:</strong> Agentic AI SDLC emphasizes <strong>prompt engineering, model selection, and evaluation-driven iteration</strong> rather than traditional code-focused development.
+            </div>
+            
+            <h3>Development Phases</h3>
+            
+            <div class="phase-card">
+                <h4>Phase 1: Problem Framing</h4>
+                <p><strong>Focus:</strong> Business context, constraints, success metrics</p>
+                <p>Understand domain requirements, define KPIs, identify regulatory constraints, map user journeys</p>
+            </div>
+            
+            <div class="phase-card">
+                <h4>Phase 2: System Design & Implementation</h4>
+                <p><strong>Focus:</strong> Data design, agent network topology, prompts, model selection</p>
+                <p><strong>Data:</strong> Vector stores, MCP integration, knowledge organization</p>
+                <p><strong>Network:</strong> Dispatcher → Specialized agents pattern</p>
+                <p><strong>Prompts:</strong> Externalized, version-controlled, A/B testable</p>
+            </div>
+            
+            <div class="phase-card">
+                <h4>Phase 3: Evaluation-Driven Iteration</h4>
+                <p><strong>Focus:</strong> LLM-as-judge + deterministic evaluators, continuous refinement</p>
+                <p>Create datasets, run evaluators, analyze results, refine prompts/models, repeat</p>
+            </div>
+            
+            <div class="phase-card">
+                <h4>Phase 4: Deployment</h4>
+                <p><strong>Focus:</strong> Configuration management, CI/CD, gradual rollout</p>
+                <p>Runtime configuration for models/prompts, automated testing, quality gates</p>
+            </div>
+            
+            <div class="phase-card">
+                <h4>Phase 5: AgentOps</h4>
+                <p><strong>Focus:</strong> Observability, traces, monitoring, debugging</p>
+                <p>LangSmith integration for traces, threads, LLM call tracking, cost attribution</p>
+            </div>
+            
+            <div class="phase-card">
+                <h4>Phase 6: Post-Deployment</h4>
+                <p><strong>Focus:</strong> Feedback loops, governance, continuous improvement</p>
+                <p>Customer feedback collection, performance monitoring, risk management, compliance audits</p>
+            </div>
+        </section>
+        
+        <section id="architecture">
+            <h2>3. Architecture Summary</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/ARCHITECTURE.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <h3>Design Pattern: Dispatcher → Specialized Agents</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Purpose</th>
+                        <th>Integration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Supervisor</strong></td>
+                        <td>Classifies and routes tickets</td>
+                        <td>Structured classification (Pydantic schemas)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Technical Support</strong></td>
+                        <td>Handles developer questions</td>
+                        <td>MCP (Model Context Protocol) for documentation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Billing</strong></td>
+                        <td>Answers billing questions</td>
+                        <td>Pinecone vector store knowledge base</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Administration</strong></td>
+                        <td>Manages admin requests</td>
+                        <td>A2A protocol with mandatory human review</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Key Architectural Choices</h3>
+            <ul>
+                <li><strong>Explicit Graph Construction:</strong> Fine-grained control over execution flow, custom patterns (ReAct loops, interrupts)</li>
+                <li><strong>Structured Output:</strong> Pydantic schemas ensure type-safe, consistent LLM outputs</li>
+                <li><strong>Runtime Configuration:</strong> RunnableConfig allows model/prompt overrides without code changes</li>
+                <li><strong>Shared State:</strong> ConversationState preserves context across agent transitions</li>
+                <li><strong>Human-in-the-Loop:</strong> Mandatory interrupt pattern for regulatory compliance</li>
+                <li><strong>Tool Isolation:</strong> Separate tool execution nodes per domain for clear boundaries</li>
+            </ul>
+            
+            <h3>LLM Model Selection Strategy</h3>
+            <p style="margin: -10px 0 15px 0;"><a href="docs/LLM_MODEL_ANALYSIS.md" style="color: #667eea; text-decoration: none; font-weight: 500; font-size: 0.95em;">📊 View detailed LLM model analysis →</a></p>
+            <div class="highlight-box">
+                <strong>Key Principle:</strong> Selective upgrades - use premium models only where quality gains justify cost.
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Node</th>
+                        <th>Recommended Model</th>
+                        <th>Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Supervisor</strong></td>
+                        <td>gpt-4o-mini</td>
+                        <td>Simple classification, high volume, cost-sensitive</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Technical Support</strong></td>
+                        <td><strong>⭐ claude-sonnet-4.5</strong></td>
+                        <td>Significant quality improvement for technical tasks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Billing</strong></td>
+                        <td>gpt-4o-mini</td>
+                        <td>Adequate quality, high volume, cost-efficient</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Administration</strong></td>
+                        <td><strong>⭐ claude-sonnet-4.5</strong> or <strong>gpt-5</strong></td>
+                        <td>Security-critical operations warrant premium models</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assessment</strong></td>
+                        <td>gpt-4o-mini</td>
+                        <td>Template-driven evaluation, upgrade conditionally</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>Implementation Priority:</strong> Admin (Phase 1) → Technical (Phase 2) → Others based on metrics</p>
+        </section>
+        
+        <section id="alignment">
+            <h2>4. Business Needs & Solution Alignment</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/BUSINESS_NEEDS_SOLUTION_ALIGNMENT.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Business Need</th>
+                        <th>Architectural Solution</th>
+                        <th>Business Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Efficient Routing</strong></td>
+                        <td>Supervisor node with structured classification</td>
+                        <td>Eliminates manual triage, 100% routing accuracy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Regulatory Compliance</strong></td>
+                        <td>Mandatory human-in-the-loop interrupt for admin actions</td>
+                        <td>Zero violations, complete audit trail</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leverage Existing Systems</strong></td>
+                        <td>Integrates Pinecone KB and A2A agent without rebuilding</td>
+                        <td>Reuses investments, maintains operational continuity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quality Assurance</strong></td>
+                        <td>Assessment node evaluates confidence and risk</td>
+                        <td>Maintains quality standards, reduces escalation needs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flexibility & A/B Testing</strong></td>
+                        <td>Runtime configuration for models and prompts</td>
+                        <td>Business agility, cost optimization per customer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost Efficiency</strong></td>
+                        <td>Selective model usage (premium only where needed)</td>
+                        <td>Foundation for 50% cost reduction target</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section id="results">
+            <h2>5. Results Snapshot</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/RESULTS_SNAPSHOT.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <div class="highlight-box">
+                <strong>Dataset:</strong> 32 examples (combined evaluation results) | <strong>Assessment:</strong> Strong foundational performance with clear progress toward KPIs
+            </div>
+            
+            <h3>Performance Highlights</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="label">Success Rate</div>
+                    <div class="value">100%</div>
+                    <div class="label">32/32 examples</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Response Time</div>
+                    <div class="value">13.8s</div>
+                    <div class="label">Mean (vs <2h target)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Classification</div>
+                    <div class="value">100%</div>
+                    <div class="label">Perfect accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Cost per Request</div>
+                    <div class="value">$0.0014</div>
+                    <div class="label">Very efficient</div>
+                </div>
+            </div>
+            
+            <h3>Quality Metrics (0-1 scale)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Supervisor Classification</td>
+                        <td><strong>1.00</strong></td>
+                        <td><span class="status-badge status-success">Perfect</span></td>
+                    </tr>
+                    <tr>
+                        <td>Trajectory Subsequence</td>
+                        <td><strong>0.96</strong></td>
+                        <td><span class="status-badge status-success">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td>Trajectory Match</td>
+                        <td><strong>0.75</strong></td>
+                        <td><span class="status-badge status-warning">Good</span></td>
+                    </tr>
+                    <tr>
+                        <td>Final Response Quality</td>
+                        <td><strong>0.66</strong></td>
+                        <td><span class="status-badge status-warning">Progress</span></td>
+                    </tr>
+                    <tr>
+                        <td>HITL Preparation</td>
+                        <td><strong>0.85</strong></td>
+                        <td><span class="status-badge status-info">Good</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>KPI Alignment</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th>Target</th>
+                        <th>Current Result</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>First Response Time</td>
+                        <td>&lt;2 hours</td>
+                        <td><strong>13.8s mean</strong></td>
+                        <td><span class="status-badge status-success">✅ Exceeds</span></td>
+                    </tr>
+                    <tr>
+                        <td>Classification Accuracy</td>
+                        <td>High accuracy</td>
+                        <td><strong>100%</strong></td>
+                        <td><span class="status-badge status-success">✅ Achieved</span></td>
+                    </tr>
+                    <tr>
+                        <td>Response Quality</td>
+                        <td>4.5+ CSAT</td>
+                        <td><strong>0.66 mean</strong> (0.30-1.00 range)</td>
+                        <td><span class="status-badge status-warning">🟡 Improving</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cost per Ticket</td>
+                        <td>$75-100</td>
+                        <td><strong>$0.0014</strong> LLM cost</td>
+                        <td><span class="status-badge status-info">🟡 On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td>Error Rate</td>
+                        <td>Minimal</td>
+                        <td><strong>0%</strong></td>
+                        <td><span class="status-badge status-success">✅ Excellent</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box">
+                <strong>Key Observation:</strong> System demonstrates robust functionality with perfect routing and fast response times. Response quality shows progress (0.66 mean, 19% perfect scores) but requires continued prompt refinement to reach 4.5+ CSAT target (equivalent to ≥0.90 quality score).
+            </div>
+        </section>
+        
+        <section id="enhancements">
+            <h2>6. Further Enhancements & Roadmap</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="docs/FURTHER_ENHANCEMENTS.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full documentation →</a></p>
+            
+            <h3>Phase 1: Foundation (Immediate)</h3>
+            <ul>
+                <li><strong>Code Quality:</strong> Expand unit test coverage, implement CI/CD workflows</li>
+                <li><strong>State Management:</strong> Refine state schema, ensure consistent field population</li>
+                <li><strong>Error Handling:</strong> Comprehensive error handling and resilience patterns</li>
+            </ul>
+            
+            <h3>Phase 2: Integration & Optimization (Short-term)</h3>
+            <ul>
+                <li><strong>Real A2A Integration:</strong> Replace mock server with production A2A agent</li>
+                <li><strong>LangChain Features:</strong> Leverage native LangChain/LangGraph/LangSmith features</li>
+                <li><strong>Evaluation Enhancements:</strong> Improve HITL evaluation infrastructure</li>
+                <li><strong>Performance:</strong> Tool call optimization, caching strategies</li>
+            </ul>
+            
+            <h3>Phase 3: Production Hardening (Medium-term)</h3>
+            <ul>
+                <li><strong>Security:</strong> OIDC/OAuth2 authentication, RBAC, multi-tenant isolation</li>
+                <li><strong>Observability:</strong> Enhanced logging, metrics, distributed tracing, alerting</li>
+                <li><strong>Scalability:</strong> Cloud deployment, Kubernetes, auto-scaling, external state management</li>
+                <li><strong>Governance:</strong> Compliance frameworks, audit trails, risk management</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <strong>Implementation Strategy:</strong> Prioritize items with highest business impact and lowest implementation complexity. Focus on quality improvements and compliance first, then scale and optimize.
+            </div>
+        </section>
+        
+        <section id="developers">
+            <h2>7. For Developers</h2>
+            <p style="margin: -15px 0 25px 0;"><a href="README.md" style="color: #667eea; text-decoration: none; font-weight: 500;">📄 View full README.md →</a></p>
+            
+            <h3>Quick Start</h3>
+            <p>A well-structured multi-agent system built with <strong>LangGraph</strong> that intelligently routes and handles customer support tickets across specialized domains with human-in-the-loop capabilities.</p>
+            
+            <h3>Technology Stack</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LangGraph</strong></td>
+                        <td>Agent orchestration and graph execution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python 3.11+</strong></td>
+                        <td>Core language (tested with Python 3.13)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>uv</strong></td>
+                        <td>Package manager and virtual environment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pinecone</strong></td>
+                        <td>Vector database for knowledge base</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A2A Protocol</strong></td>
+                        <td>Agent-to-Agent communication for admin operations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MCP</strong></td>
+                        <td>Model Context Protocol for documentation access</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Getting Started</h3>
+            <div class="two-column">
+                <div>
+                    <h4>Prerequisites</h4>
+                    <ul>
+                        <li>Python 3.11+</li>
+                        <li>Install <code>uv</code> package manager</li>
+                        <li>API keys: OpenAI, LangSmith, Pinecone</li>
+                        <li>Optional: A2A server for admin agent</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Quick Commands</h4>
+                    <ul>
+                        <li><code>uv sync</code> - Install dependencies</li>
+                        <li><code>uv run langgraph dev</code> - Start server</li>
+                        <li><code>uv run pytest tests/unit/</code> - Run tests</li>
+                        <li><code>uv run python vector_db/seed_vector_kb.py</code> - Seed KB</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>Architecture Pattern</h3>
+            <p>The system uses a <strong>dispatcher → specialized agents</strong> architecture:</p>
+            <ul>
+                <li><strong>Supervisor</strong>: Routes tickets to appropriate agents</li>
+                <li><strong>Technical Support Agent</strong>: Handles developer questions with MCP tools</li>
+                <li><strong>Billing Agent</strong>: Answers billing questions using vector store</li>
+                <li><strong>Administration Agent</strong>: Manages admin requests with A2A protocol</li>
+            </ul>
+            
+            <h3>Development Resources</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Code Quality</strong></td>
+                        <td>Black (formatter), Pylint (linter), isort (import sorter)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing</strong></td>
+                        <td>Unit tests (pytest), Evaluation suite (LangSmith), Example prompts in <code>tests/sample_scenarios/</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Development Tools</strong></td>
+                        <td>LangGraph Studio (interactive testing), Agent Chat UI (conversational interface)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Observability</strong></td>
+                        <td>LangSmith integration for traces, threads, and monitoring</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box">
+                <strong>📚 Full Developer Guide:</strong> See <a href="README.md" style="color: #667eea; font-weight: 600;">README.md</a> for complete setup instructions, environment configuration, testing procedures, and code quality guidelines.
+            </div>
+        </section>
+        
+        <footer>
+            <p>📚 <strong>Full Documentation:</strong> See <a href="docs/START_HERE.md">START_HERE.md</a> for comprehensive documentation</p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Customer Support Agent Network | Built with LangGraph | 2025
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
