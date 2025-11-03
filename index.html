@@ -260,6 +260,11 @@
             margin-bottom: 10px;
             font-size: 1.2em;
         }
+        
+        .video-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4) !important;
+        }
     </style>
 </head>
 <body>
@@ -403,6 +408,38 @@
             
             <div class="diagram-container">
                 <img src="docs/img/graph-design.png" alt="Customer Support Agent Network Graph Design">
+            </div>
+            
+            <h3>Demo Video</h3>
+            <div class="highlight-box" style="text-align: center; padding: 40px;">
+                <div style="margin-bottom: 20px;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto; display: block;">
+                        <circle cx="12" cy="12" r="10" fill="#667eea" opacity="0.2"/>
+                        <path d="M10 8L16 12L10 16V8Z" fill="#667eea"/>
+                    </svg>
+                </div>
+                <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">Watch the Demo</h4>
+                <p style="margin-bottom: 25px; color: #666;">
+                    Watch a video demonstration of the Customer Support Agent Network in action
+                </p>
+                <a href="https://www.canva.com/design/DAG3mRNy3kE/liKRVGVVotsxMO1DgSC5FQ/watch?utm_content=DAG3mRNy3kE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h6a30b6d65e" 
+                   target="_blank" 
+                   class="video-button"
+                   style="display: inline-block; 
+                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                          color: white; 
+                          padding: 15px 30px; 
+                          border-radius: 8px; 
+                          text-decoration: none; 
+                          font-weight: 600;
+                          font-size: 1.1em;
+                          transition: transform 0.3s, box-shadow 0.3s;
+                          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                    ▶ Watch Demo Video
+                </a>
+                <p style="margin-top: 15px; font-size: 0.85em; color: #999;">
+                    Opens in a new tab
+                </p>
             </div>
             
             <h3>Design Pattern: Dispatcher → Specialized Agents</h3>
