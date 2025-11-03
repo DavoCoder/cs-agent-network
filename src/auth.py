@@ -61,6 +61,11 @@ async def authenticate(headers: dict) -> Auth.types.MinimalUserDict:
     # Extract API key from headers
     # LangSmith typically uses x-api-key header
     api_key = headers.get(b"x-api-key") or headers.get("x-api-key")
+    
+    # Handle bytes conversion for x-api-key header
+    if api_key and isinstance(api_key, bytes):
+        api_key = api_key.decode("utf-8")
+    
     print(f"API key: {api_key}")
 
     # Also check Authorization header for Bearer token (alternative format)
